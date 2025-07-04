@@ -52,3 +52,11 @@ docker compose up --build
 ```
 
 PS: С наилучшими пожеланиями!
+
+Сборка и запуск
+
+docker build -t your-app-name .
+docker run -it --rm your-app-name
+
+
+Alpine не содержит locales и glibc по умолчанию.

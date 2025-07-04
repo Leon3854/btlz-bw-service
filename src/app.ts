@@ -1,6 +1,17 @@
-import knex, { migrate, seed } from "#postgres/knex.js";
+import knex, { migrate, seed } from "#postgres/knex";
+import startScheduler from "#scheduler";
 
-await migrate.latest();
-await seed.run();
+async function main() {
+  await migrate.latest();
+  await seed.run();
 
-console.log("All migrations and seeds have been run");
+  console.log("Migrations and seeds completed");
+
+  // Запускаем планировщик
+  startScheduler();
+}
+
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
