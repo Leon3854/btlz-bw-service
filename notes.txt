@@ -1176,3 +1176,124 @@ const auth = new google.auth.GoogleAuth({
 Если нужно, могу помочь с примером чтения Google credentials из файла или с настройкой Docker для этого.  
 Также могу помочь проверить, что приложение корректно подключается к базе и Google Sheets.
 
+Понял, что у вас пока нет реальных ключей Google Sheets, и вы для отладки указали в `.env`:
+
+```env
+GOOGLE_SHEETS_CREDENTIALS='any'
+```
+
+---
+
+### Что важно знать и делать в таком случае:
+
+1. **Передача переменной GOOGLE_SHEETS_CREDENTIALS с фиктивным значением — допустима для разработки**, но при попытке обращения к Google Sheets API приложение, скорее всего, упадёт с ошибкой аутентификации.
+
+2. **Если вы не используете Google Sheets API сейчас, то можно временно убрать эту переменную из `docker-compose.yml` и кода**, чтобы не было ошибок.
+
+3. **Если код ожидает переменную `GOOGLE_SHEETS_CREDENTIALS` — можно передать заглушку, но лучше в коде предусмотреть обработку отсутствия реальных ключей**, например:
+
+```ts
+const googleSheetsCreds = process.env.GOOGLE_SHEETS_CREDENTIALS;
+
+if (!googleSheetsCreds || googleSheetsCreds === 'any') {
+  console.warn('Google Sheets credentials not provided, skipping API initialization');
+  // не инициализируем Google API
+} else {
+  // инициализация Google API с реальными creds
+}
+```
+
+4. **В `docker-compose.yml` можно оставить переменную, как есть:**
+
+```yaml
+environment:
+  ...
+  GOOGLE_SHEETS_CREDENTIALS: ${GOOGLE_SHEETS_CREDENTIALS}
+```
+
+а в `.env`:
+
+```env
+GOOGLE_SHEETS_CREDENTIALS=any
+```
+
+(без кавычек, чтобы не попадали в значение).
+
+---
+
+### Итог:
+
+- Для работы с Google Sheets нужен реальный JSON сервисного аккаунта.  
+- Пока его нет — можно передавать заглушку или не передавать переменную вовсе.  
+- В коде нужно предусмотреть обработку отсутствия валидных ключей, чтобы приложение не падало.  
+- Как только получите ключи — замените `GOOGLE_SHEETS_CREDENTIALS` в `.env` на настоящий JSON (в одну строку, с экранированием).
+
+Если хотите, могу помочь написать пример кода, который безопасно обрабатывает отсутствие ключей и инициализирует Google API только при наличии валидных данных.
+
+
+Отлично, что вы поставили заглушку в виде JSON с ключами — это лучше, чем просто `'any'`, потому что структура похожа на реальную.
+
+Однако, чтобы всё работало корректно, обратите внимание на несколько важных моментов:
+
+---
+
+### 1. Формат переменной окружения GOOGLE_SHEETS_CREDENTIALS
+
+Переменная должна содержать **валидный JSON в одну строку** с корректным экранированием, особенно для многострочного поля `private_key`.
+
+Пример (упрощённый):
+
+```env
+GOOGLE_SHEETS_CREDENTIALS={"type":"service_account","project_id":"my-project","private_key_id":"abc123","private_key":"-----BEGIN PRIVATE KEY-----\\nMIIEv...\\n-----END PRIVATE KEY-----\\n","client_email":"my-email@my-project.iam.gserviceaccount.com","client_id":"1234567890","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url":"https://www.googleapis.com/robot/v1/metadata/x509/my-email%40my-project.iam.gserviceaccount.com"}
+```
+
+Обратите внимание:
+
+- Переносы строки в `private_key` заменены на `\\n` (двойной слэш + n), чтобы корректно передавать в env.
+
+- В `.env` **не используйте одинарные или двойные кавычки вокруг всего JSON**, иначе они попадут в значение переменной.
+
+---
+
+### 2. Как использовать в коде
+
+В коде вы можете распарсить JSON из переменной окружения:
+
+```ts
+let googleSheetsCredentials;
+
+try {
+  googleSheetsCredentials = JSON.parse(process.env.GOOGLE_SHEETS_CREDENTIALS || '{}');
+} catch (e) {
+  console.error('Failed to parse GOOGLE_SHEETS_CREDENTIALS:', e);
+  googleSheetsCredentials = null;
+}
+
+if (googleSheetsCredentials && googleSheetsCredentials.type === 'service_account') {
+  // Инициализируем Google API с этими ключами
+} else {
+  console.warn('Google Sheets credentials not valid or missing, skipping initialization');
+}
+```
+
+---
+
+### 3. Если у вас пока нет реальных ключей
+
+- Можно оставить фиктивные данные, но Google API вызовы будут падать с ошибкой аутентификации.
+
+- Для разработки можно заглушить вызовы Google Sheets API, чтобы приложение не падало.
+
+---
+
+### 4. Вывод
+
+- Проверьте, что в `.env` переменная `GOOGLE_SHEETS_CREDENTIALS` записана корректно (одна строка, экранирование `\n` как `\\n`).
+
+- В коде обязательно парсите JSON и обрабатывайте ошибки.
+
+- При реальном использовании замените заглушку на настоящий JSON сервисного аккаунта.
+
+---
+
+Если нужно, могу помочь с примером скрипта, который подготавливает JSON из файла в строку для `.env`, или с примером кода инициализации Google Sheets API.
