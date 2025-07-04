@@ -1,0 +1,254 @@
+Gracefully stopping... (press Ctrl+C again to force)
+[+] Stopping 2/2
+ ✔ Container app       Stopped                                                         0.0s 
+ ✔ Container postgres  Stopped                                                         0.2s 
+MacBook-Pro-L:btlz-wb-test ls$ clear
+MacBook-Pro-L:btlz-wb-test ls$ clear
+MacBook-Pro-L:btlz-wb-test ls$ docker compose down --rmi local --volumes
+[+] Running 5/5
+ ✔ Container app                      Remov...                 0.0s 
+ ✔ Container postgres                 Removed                  0.0s 
+ ✔ Image btlz-wb-test-app:latest      Removed                  0.0s 
+ ✔ Network btlz-wb-test_postgres-net  Removed                  0.2s 
+ ✔ Volume btlz-wb-test_postgres-vol   Removed                  0.0s 
+MacBook-Pro-L:btlz-wb-test ls$ docker compose up --build
+Compose can now delegate builds to bake for better performance.
+ To do so, set COMPOSE_BAKE=true.
+[+] Building 9.3s (16/16) FINISHED             docker:desktop-linux
+ => [app internal] load build definition from Dockerfile       0.0s
+ => => transferring dockerfile: 415B                           0.0s
+ => [app internal] load metadata for docker.io/library/node:2  0.8s
+ => [app internal] load .dockerignore                          0.0s
+ => => transferring context: 90B                               0.0s
+ => [app deps-prod 1/4] FROM docker.io/library/node:20-alpine  0.0s
+ => [app internal] load build context                          0.0s
+ => => transferring context: 5.21kB                            0.0s
+ => CACHED [app deps-prod 2/4] WORKDIR /app                    0.0s
+ => CACHED [app deps-prod 3/4] COPY ./package*.json .          0.0s
+ => CACHED [app deps-prod 4/4] RUN npm install --omit=dev      0.0s
+ => [app build 1/3] RUN npm install --include=dev              6.7s
+ => [app build 2/3] COPY . .                                   0.0s
+ => [app build 3/3] RUN npm run build                          1.5s
+ => CACHED [app prod 3/5] COPY --from=build /app/package*.jso  0.0s
+ => CACHED [app prod 4/5] COPY --from=deps-prod /app/node_mod  0.0s
+ => [app prod 5/5] COPY --from=build /app/dist ./dist          0.0s
+ => [app] exporting to image                                   0.0s
+ => => exporting layers                                        0.0s
+ => => writing image sha256:2794f7c327d47f4b99c72a4b437d4f291  0.0s
+ => => naming to docker.io/library/btlz-wb-test-app            0.0s
+ => [app] resolving provenance for metadata file               0.0s
+[+] Running 5/5
+ ✔ app                                 Built                   0.0s 
+ ✔ Network btlz-wb-test_postgres-net   Created                 0.0s 
+ ✔ Volume "btlz-wb-test_postgres-vol"  Created                 0.0s 
+ ✔ Container postgres                  Created                 0.0s 
+ ✔ Container app                       Crea...                 0.0s 
+Attaching to app, postgres
+postgres  | The files belonging to this database system will be owned by user "postgres".
+postgres  | This user must also own the server process.
+postgres  | 
+postgres  | The database cluster will be initialized with locale "en_US.utf8".
+postgres  | The default database encoding has accordingly been set to "UTF8".
+postgres  | The default text search configuration will be set to "english".
+postgres  | 
+postgres  | Data page checksums are disabled.
+postgres  | 
+postgres  | fixing permissions on existing directory /var/lib/postgresql/data/pgdata ... ok
+postgres  | creating subdirectories ... ok
+postgres  | selecting dynamic shared memory implementation ... posix
+postgres  | selecting default max_connections ... 100
+postgres  | selecting default shared_buffers ... 128MB
+postgres  | selecting default time zone ... UTC
+postgres  | creating configuration files ... ok
+postgres  | running bootstrap script ... ok
+postgres  | sh: locale: not found
+postgres  | 2025-07-03 22:16:08.219 UTC [31] WARNING:  no usable system locales were found
+postgres  | performing post-bootstrap initialization ... ok
+postgres  | initdb: warning: enabling "trust" authentication for local connections
+postgres  | initdb: hint: You can change this by editing pg_hba.conf or using the option -A, or --auth-local and --auth-host, the next time you run initdb.
+postgres  | syncing data to disk ... ok
+postgres  | 
+postgres  | 
+postgres  | Success. You can now start the database server using:
+postgres  | 
+postgres  |     pg_ctl -D /var/lib/postgresql/data/pgdata -l logfile start
+postgres  | 
+postgres  | waiting for server to start....2025-07-03 22:16:08.483 UTC [37] LOG:  starting PostgreSQL 16.1 on aarch64-unknown-linux-musl, compiled by gcc (Alpine 13.2.1_git20231014) 13.2.1 20231014, 64-bit
+postgres  | 2025-07-03 22:16:08.483 UTC [37] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres  | 2025-07-03 22:16:08.486 UTC [40] LOG:  database system was shut down at 2025-07-03 22:16:08 UTC
+postgres  | 2025-07-03 22:16:08.488 UTC [37] LOG:  database system is ready to accept connections
+postgres  |  done
+postgres  | server started
+postgres  | 
+postgres  | /usr/local/bin/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
+postgres  | 
+postgres  | waiting for server to shut down....2025-07-03 22:16:08.593 UTC [37] LOG:  received fast shutdown request
+postgres  | 2025-07-03 22:16:08.594 UTC [37] LOG:  aborting any active transactions
+postgres  | 2025-07-03 22:16:08.595 UTC [37] LOG:  background worker "logical replication launcher" (PID 43) exited with exit code 1
+postgres  | 2025-07-03 22:16:08.596 UTC [38] LOG:  shutting down
+postgres  | 2025-07-03 22:16:08.597 UTC [38] LOG:  checkpoint starting: shutdown immediate
+postgres  | 2025-07-03 22:16:08.600 UTC [38] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.002 s, sync=0.001 s, total=0.005 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB; lsn=0/14F0480, redo lsn=0/14F0480
+postgres  | 2025-07-03 22:16:08.602 UTC [37] LOG:  database system is shut down
+postgres  |  done
+postgres  | server stopped
+postgres  | 
+postgres  | PostgreSQL init process complete; ready for start up.
+postgres  | 
+postgres  | 2025-07-03 22:16:08.713 UTC [1] LOG:  starting PostgreSQL 16.1 on aarch64-unknown-linux-musl, compiled by gcc (Alpine 13.2.1_git20231014) 13.2.1 20231014, 64-bit
+postgres  | 2025-07-03 22:16:08.714 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+postgres  | 2025-07-03 22:16:08.714 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+postgres  | 2025-07-03 22:16:08.715 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres  | 2025-07-03 22:16:08.718 UTC [51] LOG:  database system was shut down at 2025-07-03 22:16:08 UTC
+postgres  | 2025-07-03 22:16:08.721 UTC [1] LOG:  database system is ready to accept connections
+app       | 
+app       | > btlz-test@1.0.0 start
+app       | > node dist/app.js
+app       | 
+app       | Batch 1 ran the following migrations:
+app       | - 20250227184908_spreadsheets.js
+app       | Ran 1 seed files
+app       | - spreadsheets.js
+app       | All migrations and seeds have been run
+postgres  | 2025-07-03 22:21:08.802 UTC [49] LOG:  checkpoint starting: time
+postgres  | 2025-07-03 22:21:19.568 UTC [49] LOG:  checkpoint complete: wrote 107 buffers (0.7%); 0 WAL file(s) added, 0 removed, 0 recycled; write=10.748 s, sync=0.011 s, total=10.766 s; sync files=55, longest=0.002 s, average=0.001 s; distance=461 kB, estimate=461 kB; lsn=0/1563A30, redo lsn=0/15639F8
+
+Судя по логам, PostgreSQL успешно инициализируется и запускается, принимает подключения (строка `database system is ready to accept connections`), а контейнер `app` запускает приложение и выполняет миграции без ошибок.
+
+Если хотите проверить именно логи подключения к базе (успешные или неудачные попытки подключения), то по умолчанию PostgreSQL пишет такие сообщения в логи, но уровень логирования может быть не очень подробным.
+
+---
+
+### Как включить более подробное логирование подключений в PostgreSQL (в Docker)
+
+1. Добавьте в `docker-compose.yaml` для сервиса `postgres` переменную окружения или команду, чтобы включить подробные логи:
+
+Например, можно переопределить параметры через `command`:
+
+```yaml
+services:
+  postgres:
+    image: postgres:16.1-alpine
+    environment:
+      POSTGRES_USER: youruser
+      POSTGRES_PASSWORD: yourpassword
+      POSTGRES_DB: yourdb
+    command:
+      - postgres
+      - -c
+      - log_connections=on
+      - -c
+      - log_disconnections=on
+      - -c
+      - log_statement=all
+    ...
+```
+
+Или использовать конфигурационный файл `postgresql.conf` с нужными параметрами (более сложно).
+
+2. Перезапустите контейнер:
+
+```bash
+docker compose down
+docker compose up -d
+```
+
+3. Теперь в логах контейнера `postgres` будут появляться сообщения о каждом подключении и отключении, а также все SQL-запросы.
+
+---
+
+### Просмотр логов подключения
+
+```bash
+docker compose logs -f postgres
+```
+
+В логах вы увидите строки вида:
+
+```
+LOG:  connection authorized: user=youruser database=yourdb application_name=psql
+LOG:  disconnection: session time: ...
+```
+
+Если есть ошибки авторизации, они тоже будут видны.
+
+---
+
+### Итог
+
+- Логи из вашего вывода показывают, что база запускается и работает.
+- Для детального логирования подключений включите `log_connections` и `log_disconnections`.
+- После этого смотрите логи контейнера `postgres` через `docker compose logs postgres`.
+
+Если нужно, могу помочь с точной настройкой.
+
+
+В логах, которые вы показали, видна инициализация и нормальный запуск PostgreSQL, а затем его корректное выключение (fast shutdown request). Однако нет сообщений о подключениях клиентов (например, вашего приложения) или SQL-запросах.
+
+Это значит, что в текущей конфигурации PostgreSQL не логирует подключения и запросы.
+
+---
+
+### Что делать, чтобы увидеть логи подключений и запросов?
+
+1. **Включить логирование подключений и отключений**  
+Добавьте в `docker-compose.yml` для сервиса postgres параметры конфигурации:
+
+```yaml
+services:
+  postgres:
+    image: postgres:16.1-alpine
+    environment:
+      POSTGRES_USER: youruser
+      POSTGRES_PASSWORD: yourpassword
+      POSTGRES_DB: yourdb
+    command:
+      - postgres
+      - -c
+      - log_connections=on
+      - -c
+      - log_disconnections=on
+      - -c
+      - log_statement=all
+```
+
+Это заставит PostgreSQL логировать все подключения, отключения и все SQL-запросы.
+
+2. **Перезапустить контейнеры:**
+
+```bash
+docker compose down
+docker compose up -d
+```
+
+3. **Посмотреть логи снова:**
+
+```bash
+docker compose logs -f postgres
+```
+
+Теперь в логах должны появиться строки вида:
+
+```
+LOG: connection authorized: user=youruser database=yourdb application_name=yourapp
+LOG: disconnection: session time: ...
+LOG: statement: SELECT ...
+```
+
+---
+
+### Почему в текущих логах нет подключений?
+
+- Логи показывают только старт и остановку сервера.
+- Возможно, приложение не подключается к базе или подключается, но PostgreSQL не логирует эти события по умолчанию.
+- Включение `log_connections` и `log_statement` даст больше информации.
+
+---
+
+### Дополнительно
+
+- В логах есть предупреждение `sh: locale: not found` и `no usable system locales were found`. Это связано с образом Alpine и не критично, но можно решить, установив пакет `locales` или `glibc` в образе, если нужно.
+- Если приложение запускается и миграции выполняются (как в ваших предыдущих логах), значит подключение к базе есть — просто его не видно в логах.
+
+---
+
+Если хотите, могу помочь с точным примером `docker-compose.yml` для вашего случая.
