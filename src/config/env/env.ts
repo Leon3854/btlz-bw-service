@@ -19,7 +19,6 @@ const envSchema = z.object({
             .regex(/^[0-9]+$/)
             .transform((value) => parseInt(value)),
     ]),
-		JWT_SECRET: z.string().min(10, "JWT secret must be at least 10 characters long"),
 });
 
 const env = envSchema.parse({
@@ -30,7 +29,6 @@ const env = envSchema.parse({
     POSTGRES_PASSWORD: process.env.POSTGRES_PASSWORD,
     NODE_ENV: process.env.NODE_ENV,
     APP_PORT: process.env.APP_PORT,
-		JWT_SECRET: process.env.JWT_SECRET,
 });
 
 export default env;
