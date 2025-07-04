@@ -1,0 +1,1299 @@
+Gracefully stopping... (press Ctrl+C again to force)
+[+] Stopping 2/2
+ ✔ Container app       Stopped                                                         0.0s 
+ ✔ Container postgres  Stopped                                                         0.2s 
+MacBook-Pro-L:btlz-wb-test ls$ clear
+MacBook-Pro-L:btlz-wb-test ls$ clear
+MacBook-Pro-L:btlz-wb-test ls$ docker compose down --rmi local --volumes
+[+] Running 5/5
+ ✔ Container app                      Remov...                 0.0s 
+ ✔ Container postgres                 Removed                  0.0s 
+ ✔ Image btlz-wb-test-app:latest      Removed                  0.0s 
+ ✔ Network btlz-wb-test_postgres-net  Removed                  0.2s 
+ ✔ Volume btlz-wb-test_postgres-vol   Removed                  0.0s 
+MacBook-Pro-L:btlz-wb-test ls$ docker compose up --build
+Compose can now delegate builds to bake for better performance.
+ To do so, set COMPOSE_BAKE=true.
+[+] Building 9.3s (16/16) FINISHED             docker:desktop-linux
+ => [app internal] load build definition from Dockerfile       0.0s
+ => => transferring dockerfile: 415B                           0.0s
+ => [app internal] load metadata for docker.io/library/node:2  0.8s
+ => [app internal] load .dockerignore                          0.0s
+ => => transferring context: 90B                               0.0s
+ => [app deps-prod 1/4] FROM docker.io/library/node:20-alpine  0.0s
+ => [app internal] load build context                          0.0s
+ => => transferring context: 5.21kB                            0.0s
+ => CACHED [app deps-prod 2/4] WORKDIR /app                    0.0s
+ => CACHED [app deps-prod 3/4] COPY ./package*.json .          0.0s
+ => CACHED [app deps-prod 4/4] RUN npm install --omit=dev      0.0s
+ => [app build 1/3] RUN npm install --include=dev              6.7s
+ => [app build 2/3] COPY . .                                   0.0s
+ => [app build 3/3] RUN npm run build                          1.5s
+ => CACHED [app prod 3/5] COPY --from=build /app/package*.jso  0.0s
+ => CACHED [app prod 4/5] COPY --from=deps-prod /app/node_mod  0.0s
+ => [app prod 5/5] COPY --from=build /app/dist ./dist          0.0s
+ => [app] exporting to image                                   0.0s
+ => => exporting layers                                        0.0s
+ => => writing image sha256:2794f7c327d47f4b99c72a4b437d4f291  0.0s
+ => => naming to docker.io/library/btlz-wb-test-app            0.0s
+ => [app] resolving provenance for metadata file               0.0s
+[+] Running 5/5
+ ✔ app                                 Built                   0.0s 
+ ✔ Network btlz-wb-test_postgres-net   Created                 0.0s 
+ ✔ Volume "btlz-wb-test_postgres-vol"  Created                 0.0s 
+ ✔ Container postgres                  Created                 0.0s 
+ ✔ Container app                       Crea...                 0.0s 
+Attaching to app, postgres
+postgres  | The files belonging to this database system will be owned by user "postgres".
+postgres  | This user must also own the server process.
+postgres  | 
+postgres  | The database cluster will be initialized with locale "en_US.utf8".
+postgres  | The default database encoding has accordingly been set to "UTF8".
+postgres  | The default text search configuration will be set to "english".
+postgres  | 
+postgres  | Data page checksums are disabled.
+postgres  | 
+postgres  | fixing permissions on existing directory /var/lib/postgresql/data/pgdata ... ok
+postgres  | creating subdirectories ... ok
+postgres  | selecting dynamic shared memory implementation ... posix
+postgres  | selecting default max_connections ... 100
+postgres  | selecting default shared_buffers ... 128MB
+postgres  | selecting default time zone ... UTC
+postgres  | creating configuration files ... ok
+postgres  | running bootstrap script ... ok
+postgres  | sh: locale: not found
+postgres  | 2025-07-03 22:16:08.219 UTC [31] WARNING:  no usable system locales were found
+postgres  | performing post-bootstrap initialization ... ok
+postgres  | initdb: warning: enabling "trust" authentication for local connections
+postgres  | initdb: hint: You can change this by editing pg_hba.conf or using the option -A, or --auth-local and --auth-host, the next time you run initdb.
+postgres  | syncing data to disk ... ok
+postgres  | 
+postgres  | 
+postgres  | Success. You can now start the database server using:
+postgres  | 
+postgres  |     pg_ctl -D /var/lib/postgresql/data/pgdata -l logfile start
+postgres  | 
+postgres  | waiting for server to start....2025-07-03 22:16:08.483 UTC [37] LOG:  starting PostgreSQL 16.1 on aarch64-unknown-linux-musl, compiled by gcc (Alpine 13.2.1_git20231014) 13.2.1 20231014, 64-bit
+postgres  | 2025-07-03 22:16:08.483 UTC [37] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres  | 2025-07-03 22:16:08.486 UTC [40] LOG:  database system was shut down at 2025-07-03 22:16:08 UTC
+postgres  | 2025-07-03 22:16:08.488 UTC [37] LOG:  database system is ready to accept connections
+postgres  |  done
+postgres  | server started
+postgres  | 
+postgres  | /usr/local/bin/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
+postgres  | 
+postgres  | waiting for server to shut down....2025-07-03 22:16:08.593 UTC [37] LOG:  received fast shutdown request
+postgres  | 2025-07-03 22:16:08.594 UTC [37] LOG:  aborting any active transactions
+postgres  | 2025-07-03 22:16:08.595 UTC [37] LOG:  background worker "logical replication launcher" (PID 43) exited with exit code 1
+postgres  | 2025-07-03 22:16:08.596 UTC [38] LOG:  shutting down
+postgres  | 2025-07-03 22:16:08.597 UTC [38] LOG:  checkpoint starting: shutdown immediate
+postgres  | 2025-07-03 22:16:08.600 UTC [38] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.002 s, sync=0.001 s, total=0.005 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB; lsn=0/14F0480, redo lsn=0/14F0480
+postgres  | 2025-07-03 22:16:08.602 UTC [37] LOG:  database system is shut down
+postgres  |  done
+postgres  | server stopped
+postgres  | 
+postgres  | PostgreSQL init process complete; ready for start up.
+postgres  | 
+postgres  | 2025-07-03 22:16:08.713 UTC [1] LOG:  starting PostgreSQL 16.1 on aarch64-unknown-linux-musl, compiled by gcc (Alpine 13.2.1_git20231014) 13.2.1 20231014, 64-bit
+postgres  | 2025-07-03 22:16:08.714 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+postgres  | 2025-07-03 22:16:08.714 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+postgres  | 2025-07-03 22:16:08.715 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres  | 2025-07-03 22:16:08.718 UTC [51] LOG:  database system was shut down at 2025-07-03 22:16:08 UTC
+postgres  | 2025-07-03 22:16:08.721 UTC [1] LOG:  database system is ready to accept connections
+app       | 
+app       | > btlz-test@1.0.0 start
+app       | > node dist/app.js
+app       | 
+app       | Batch 1 ran the following migrations:
+app       | - 20250227184908_spreadsheets.js
+app       | Ran 1 seed files
+app       | - spreadsheets.js
+app       | All migrations and seeds have been run
+postgres  | 2025-07-03 22:21:08.802 UTC [49] LOG:  checkpoint starting: time
+postgres  | 2025-07-03 22:21:19.568 UTC [49] LOG:  checkpoint complete: wrote 107 buffers (0.7%); 0 WAL file(s) added, 0 removed, 0 recycled; write=10.748 s, sync=0.011 s, total=10.766 s; sync files=55, longest=0.002 s, average=0.001 s; distance=461 kB, estimate=461 kB; lsn=0/1563A30, redo lsn=0/15639F8
+
+Судя по логам, PostgreSQL успешно инициализируется и запускается, принимает подключения (строка `database system is ready to accept connections`), а контейнер `app` запускает приложение и выполняет миграции без ошибок.
+
+Если хотите проверить именно логи подключения к базе (успешные или неудачные попытки подключения), то по умолчанию PostgreSQL пишет такие сообщения в логи, но уровень логирования может быть не очень подробным.
+
+---
+
+### Как включить более подробное логирование подключений в PostgreSQL (в Docker)
+
+1. Добавьте в `docker-compose.yaml` для сервиса `postgres` переменную окружения или команду, чтобы включить подробные логи:
+
+Например, можно переопределить параметры через `command`:
+
+```yaml
+services:
+  postgres:
+    image: postgres:16.1-alpine
+    environment:
+      POSTGRES_USER: youruser
+      POSTGRES_PASSWORD: yourpassword
+      POSTGRES_DB: yourdb
+    command:
+      - postgres
+      - -c
+      - log_connections=on
+      - -c
+      - log_disconnections=on
+      - -c
+      - log_statement=all
+    ...
+```
+
+Или использовать конфигурационный файл `postgresql.conf` с нужными параметрами (более сложно).
+
+2. Перезапустите контейнер:
+
+```bash
+docker compose down
+docker compose up -d
+```
+
+3. Теперь в логах контейнера `postgres` будут появляться сообщения о каждом подключении и отключении, а также все SQL-запросы.
+
+---
+
+### Просмотр логов подключения
+
+```bash
+docker compose logs -f postgres
+```
+
+В логах вы увидите строки вида:
+
+```
+LOG:  connection authorized: user=youruser database=yourdb application_name=psql
+LOG:  disconnection: session time: ...
+```
+
+Если есть ошибки авторизации, они тоже будут видны.
+
+---
+
+### Итог
+
+- Логи из вашего вывода показывают, что база запускается и работает.
+- Для детального логирования подключений включите `log_connections` и `log_disconnections`.
+- После этого смотрите логи контейнера `postgres` через `docker compose logs postgres`.
+
+Если нужно, могу помочь с точной настройкой.
+
+
+В логах, которые вы показали, видна инициализация и нормальный запуск PostgreSQL, а затем его корректное выключение (fast shutdown request). Однако нет сообщений о подключениях клиентов (например, вашего приложения) или SQL-запросах.
+
+Это значит, что в текущей конфигурации PostgreSQL не логирует подключения и запросы.
+
+---
+
+### Что делать, чтобы увидеть логи подключений и запросов?
+
+1. **Включить логирование подключений и отключений**  
+Добавьте в `docker-compose.yml` для сервиса postgres параметры конфигурации:
+
+```yaml
+services:
+  postgres:
+    image: postgres:16.1-alpine
+    environment:
+      POSTGRES_USER: youruser
+      POSTGRES_PASSWORD: yourpassword
+      POSTGRES_DB: yourdb
+    command:
+      - postgres
+      - -c
+      - log_connections=on
+      - -c
+      - log_disconnections=on
+      - -c
+      - log_statement=all
+```
+
+Это заставит PostgreSQL логировать все подключения, отключения и все SQL-запросы.
+
+2. **Перезапустить контейнеры:**
+
+```bash
+docker compose down
+docker compose up -d
+```
+
+3. **Посмотреть логи снова:**
+
+```bash
+docker compose logs -f postgres
+```
+
+Теперь в логах должны появиться строки вида:
+
+```
+LOG: connection authorized: user=youruser database=yourdb application_name=yourapp
+LOG: disconnection: session time: ...
+LOG: statement: SELECT ...
+```
+
+---
+
+### Почему в текущих логах нет подключений?
+
+- Логи показывают только старт и остановку сервера.
+- Возможно, приложение не подключается к базе или подключается, но PostgreSQL не логирует эти события по умолчанию.
+- Включение `log_connections` и `log_statement` даст больше информации.
+
+---
+
+### Дополнительно
+
+- В логах есть предупреждение `sh: locale: not found` и `no usable system locales were found`. Это связано с образом Alpine и не критично, но можно решить, установив пакет `locales` или `glibc` в образе, если нужно.
+- Если приложение запускается и миграции выполняются (как в ваших предыдущих логах), значит подключение к базе есть — просто его не видно в логах.
+
+---
+
+Если хотите, могу помочь с точным примером `docker-compose.yml` для вашего случая.
+
+// Добавленна типизация в knex.ts для migrate и seed
+interface MigrationResult {
+  batch: number;
+  migrations: string[];
+}
+
+
+
+
+
+
+
+
+создать сервис, выполняющий 2 задачи:
+регулярное получение информации о тарифах wb и сохранение их в БД на каждый день;
+регулярное обновление информации о актуальных тарифах в google-таблицах.
+
+Входные данные
+
+СУБД - PostgreSQL.
+Библиотека для работы с СУБД knex.js
+Описание типов - typescript.
+Endpoint: https://common-api.wildberries.ru/api/v1/tariffs/box 
+(Тарифы для коробов )
+
+Обращение к google-таблицам для выгрузки данных из PostgreSQL должно производится по их идентификатору. Количество таблиц - N.
+Приложение запускается и работает в docker контейнерах. вот все файлы с скаченного шаблона src/config/knex/knexfile.ts import env from "#config/env/env";
+import { Knex } from "knex";
+import { z } from "zod";
+
+const connectionSchema = z.object({
+  host: z.string(),
+  port: z.number(),
+  database: z.string(),
+  user: z.string(),
+  password: z.string(),
+});
+
+const NODE_ENV = env.NODE_ENV ?? "development";
+
+const knegConfigs: Record<typeof NODE_ENV, Knex.Config> = {
+  development: {
+    client: "pg",
+    connection: () =>
+      connectionSchema.parse({
+        host: env.POSTGRES_HOST ?? "localhost",
+        port: env.POSTGRES_PORT ?? 5432,
+        database: env.POSTGRES_DB ?? "postgres",
+        user: env.POSTGRES_USER ?? "postgres",
+        password: env.POSTGRES_PASSWORD ?? "postgres",
+      }),
+    pool: {
+      min: 2,
+      max: 10,
+    },
+    migrations: {
+      stub: "src/config/knex/migration.stub.js",
+      directory: "./src/postgres/migrations",
+      tableName: "migrations",
+      extension: "ts",
+    },
+    seeds: {
+      stub: "src/config/knex/seed.stub.js",
+      directory: "./src/postgres/seeds",
+      extension: "js",
+    },
+  },
+  production: {
+    client: "pg",
+    connection: () =>
+      connectionSchema.parse({
+        host: env.POSTGRES_HOST,
+        port: env.POSTGRES_PORT,
+        database: env.POSTGRES_DB,
+        user: env.POSTGRES_USER,
+        password: env.POSTGRES_PASSWORD,
+      }),
+    pool: {
+      min: 2,
+      max: 10,
+    },
+    migrations: {
+      stub: "dist/config/knex/migration.stub.js",
+      directory: "./dist/postgres/migrations",
+      tableName: "migrations",
+      extension: "js",
+    },
+    seeds: {
+      stub: "src/config/knex/seed.stub.js",
+      directory: "./dist/postgres/seeds",
+      extension: "js",
+    },
+  },
+};
+
+export default knegConfigs[NODE_ENV];
+вот postgres/ knex.ts. import _knex from "knex";
+import knexConfig from "#config/knex/knexfile";
+
+const knex = _knex(knexConfig);
+
+// Типизация для migrate и seed
+interface MigrationResult {
+  batch: number;
+  migrations: string[];
+}
+
+export default knex;
+
+function logMigrationResults(action: string, result: [number, string[]]) {
+  if (result[1].length === 0) {
+    console.log(
+      ["latest", "up"].includes(action)
+        ? "All migrations are up to date"
+        : "All migrations have been rolled back"
+    );
+    return;
+  }
+  console.log(
+    `Batch ${result[0]} ${["latest", "up"].includes(action) ? "ran" : "rolled back"} the following migrations:`
+  );
+  for (const migration of result[1]) {
+    console.log("- " + migration);
+  }
+}
+function logMigrationList(list: [{ name: string }[], { file: string }[]]) {
+  console.log(`Found ${list[0].length} Completed Migration file/files.`);
+  for (const migration of list[0]) {
+    console.log("- " + migration.name);
+  }
+  console.log(`Found ${list[1].length} Pending Migration file/files.`);
+  for (const migration of list[1]) {
+    console.log("- " + migration.file);
+  }
+}
+
+function logSeedRun(result: [string[]]) {
+  if (result[0].length === 0) {
+    console.log("No seeds to run");
+  }
+  console.log(`Ran ${result[0].length} seed files`);
+  for (const seed of result[0]) {
+    console.log("- " + seed?.split(/\/|\\/).pop());
+  }
+  // Ran 5 seed files
+}
+
+function logSeedMake(name: string) {
+  console.log(`Created seed: ${name.split(/\/|\\/).pop()}`);
+}
+
+export const migrate = {
+  latest: async () => {
+    logMigrationResults("latest", await knex.migrate.latest());
+  },
+  rollback: async () => {
+    logMigrationResults("rollback", await knex.migrate.rollback());
+  },
+  down: async (name?: string) => {
+    logMigrationResults("down", await knex.migrate.down({ name }));
+  },
+  up: async (name?: string) => {
+    logMigrationResults("up", await knex.migrate.up({ name }));
+  },
+  list: async () => {
+    logMigrationList(await knex.migrate.list());
+  },
+  make: async (name: string) => {
+    if (!name) {
+      console.error("Please provide a migration name");
+      process.exit(1);
+    }
+    console.log(await knex.migrate.make(name, { extension: "js" }));
+  },
+};
+
+export const seed = {
+  run: async () => {
+    logSeedRun(await knex.seed.run());
+  },
+  make: async (name: string) => {
+    if (!name) {
+      console.error("Please provide a seed name");
+      process.exit(1);
+    }
+    logSeedMake(await knex.seed.make(name));
+  },
+};
+а вот utils/knex.ts. import { migrate, seed } from "#postgres/knex";
+import { Command } from "commander";
+const program = new Command();
+
+program
+  .command("migrate")
+  .argument("[type]", "latest|rollback|status|down|up|list")
+  .argument("[arg]", "version")
+  .action(async (action, arg) => {
+    if (!action) return;
+    if (action === "latest") await migrate.latest();
+    if (action === "rollback") await migrate.rollback();
+    if (action === "down") await migrate.down(arg);
+    if (action === "up") await migrate.up(arg);
+    if (action === "list") await migrate.list();
+    if (action === "make") await migrate.make(arg);
+    process.exit(0);
+  });
+program.command("seed [action] [arg]").action(async (action, arg) => {
+  if (!action) return;
+  if (action === "run") await seed.run();
+  if (action === "make") await seed.make(arg);
+  process.exit(0);
+});
+program.command("default", { isDefault: true }).action(() => {});
+program.parse();
+и вот файл app.ts  import knex, { migrate, seed } from "#postgres/knex";
+
+await migrate.latest();
+await seed.run();
+
+console.log("All migrations and seeds have been run");
+Я предоставил тебе все эти файлы для того что бы ты сразу понял в чем проблема. Покажи  пожалуйста готовый сервис для данного  knex
+обновление сервиа для получения информации о тарифах надо сделать каждые 12 чаосв
+а обновлени таблиц каждые 6 часов
+
+
+Спасибо за предоставленную информацию. Я понимаю, что нужно создать сервис на TypeScript с использованием Knex.js и PostgreSQL, который будет:
+
+1. Регулярно получать тарифы Wildberries по API `https://common-api.wildberries.ru/api/v1/tariffs/box` и сохранять их в базу данных.
+2. Регулярно обновлять данные из БД в Google Sheets по N таблицам (идентификаторам).
+
+---
+
+## Что я сделаю
+
+- Опишу структуру таблицы для тарифов.
+- Создам миграцию для таблицы.
+- Напишу сервис для получения тарифов и сохранения их в БД.
+- Реализую сервис для обновления Google Sheets (через Google Sheets API).
+- Настрою расписание (cron) для периодического запуска этих задач.
+- Использую ваши настройки knex и env.
+
+---
+
+# 1. Миграция для таблицы тарифов
+
+Создайте миграцию `create_tariffs_table.ts` в `src/postgres/migrations/`:
+
+```ts
+import { Knex } from "knex";
+
+export async function up(knex: Knex): Promise<void> {
+  return knex.schema.createTable("tariffs", (table) => {
+    table.increments("id").primary();
+    table.string("tariff_id").notNullable().index(); // уникальный id тарифа из API
+    table.string("name").notNullable();
+    table.decimal("price", 10, 2).notNullable();
+    table.jsonb("raw_data").notNullable(); // для хранения всей информации
+    table.date("date").notNullable().index(); // дата, на которую актуален тариф
+    table.timestamps(true, true);
+    table.unique(["tariff_id", "date"]); // уникальность тарифа на дату
+  });
+}
+
+export async function down(knex: Knex): Promise<void> {
+  return knex.schema.dropTableIfExists("tariffs");
+}
+```
+
+---
+
+# 2. Типы TypeScript для тарифов
+
+Создайте файл `src/types/tariffs.ts`:
+
+```ts
+export interface Tariff {
+  tariff_id: string; // id тарифа из API
+  name: string;
+  price: number;
+  [key: string]: any; // остальные поля
+}
+```
+
+---
+
+# 3. Сервис для получения тарифов и сохранения в БД
+
+Создайте файл `src/services/tariffsService.ts`:
+
+```ts
+import axios from "axios";
+import knex from "#postgres/knex";
+import { Tariff } from "#types/tariffs";
+
+const WB_TARIFFS_URL = "https://common-api.wildberries.ru/api/v1/tariffs/box";
+
+export async function fetchTariffsFromWB(): Promise<Tariff[]> {
+  const response = await axios.get(WB_TARIFFS_URL);
+  // Предполагаем, что API возвращает массив тарифов в response.data
+  return response.data;
+}
+
+export async function saveTariffsToDB(tariffs: Tariff[], date: Date): Promise<void> {
+  // Для простоты, будем использовать upsert (Postgres ON CONFLICT)
+  for (const tariff of tariffs) {
+    await knex("tariffs")
+      .insert({
+        tariff_id: tariff.tariff_id,
+        name: tariff.name,
+        price: tariff.price,
+        raw_data: JSON.stringify(tariff),
+        date,
+      })
+      .onConflict(["tariff_id", "date"])
+      .merge({
+        name: tariff.name,
+        price: tariff.price,
+        raw_data: JSON.stringify(tariff),
+        updated_at: knex.fn.now(),
+      });
+  }
+}
+
+export async function updateTariffs(): Promise<void> {
+  const tariffs = await fetchTariffsFromWB();
+  const today = new Date();
+  const dateString = today.toISOString().split("T")[0]; // yyyy-mm-dd
+  await saveTariffsToDB(tariffs, new Date(dateString));
+  console.log(`Tariffs updated for date ${dateString}`);
+}
+```
+
+---
+
+# 4. Сервис для обновления Google Sheets
+
+Для работы с Google Sheets нам нужна авторизация через OAuth2 или сервисный аккаунт.
+
+Создайте файл `src/services/googleSheetsService.ts`:
+
+```ts
+import { google, sheets_v4 } from "googleapis";
+import knex from "#postgres/knex";
+
+const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
+const GOOGLE_SHEETS_CREDENTIALS = process.env.GOOGLE_SHEETS_CREDENTIALS || ""; // JSON в env
+const GOOGLE_SHEETS_TOKEN = process.env.GOOGLE_SHEETS_TOKEN || ""; // JSON в env
+
+// Парсим credentials
+const credentials = JSON.parse(GOOGLE_SHEETS_CREDENTIALS);
+
+const auth = new google.auth.GoogleAuth({
+  credentials,
+  scopes: SCOPES,
+});
+
+const sheets = google.sheets({ version: "v4", auth });
+
+interface SheetInfo {
+  id: string; // Идентификатор Google таблицы
+  name?: string; // Опционально имя листа
+}
+
+// Предположим, что у нас есть таблица в БД с id таблиц Google Sheets
+// Для примера, создадим тип и функцию получения этих id
+export async function getGoogleSheetIds(): Promise<SheetInfo[]> {
+  // Здесь можно хранить таблицы в отдельной таблице БД, например google_sheets
+  // Для примера жестко возвращаем массив
+  return [
+    { id: "sheetId1", name: "Лист1" },
+    { id: "sheetId2", name: "Тарифы" },
+    // ...
+  ];
+}
+
+/**
+ * Получить тарифы из БД для конкретной даты
+ */
+export async function getTariffsFromDB(date: Date): Promise<any[]> {
+  const dateString = date.toISOString().split("T")[0];
+  return knex("tariffs")
+    .select("tariff_id", "name", "price")
+    .where("date", dateString);
+}
+
+/**
+ * Обновить данные в Google Sheet
+ */
+export async function updateGoogleSheet(sheetId: string, data: any[][]): Promise<void> {
+  // Очистим лист (например, 'Sheet1')
+  const range = "Sheet1!A1";
+
+  // Запишем данные
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    range,
+    valueInputOption: "USER_ENTERED",
+    requestBody: {
+      values: data,
+    },
+  });
+}
+
+/**
+ * Основная функция обновления всех Google Sheets
+ */
+export async function updateGoogleSheetsForTariffs(date: Date): Promise<void> {
+  const sheetsInfo = await getGoogleSheetIds();
+  const tariffs = await getTariffsFromDB(date);
+
+  // Формируем данные для Google Sheets: заголовки + данные
+  const values = [["Tariff ID", "Name", "Price"]];
+  for (const t of tariffs) {
+    values.push([t.tariff_id, t.name, t.price.toString()]);
+  }
+
+  for (const sheet of sheetsInfo) {
+    await updateGoogleSheet(sheet.id, values);
+    console.log(`Google Sheet ${sheet.id} updated`);
+  }
+}
+```
+
+---
+
+# 5. Планировщик задач (cron)
+
+Создайте файл `src/scheduler.ts`:
+
+```ts
+import cron from "node-cron";
+import { updateTariffs } from "./services/tariffsService";
+import { updateGoogleSheetsForTariffs } from "./services/googleSheetsService";
+
+function startScheduler() {
+  // Например, обновлять тарифы каждый день в 01:00
+  cron.schedule("0 1 * * *", async () => {
+    try {
+      console.log("Starting tariffs update...");
+      await updateTariffs();
+
+      const today = new Date();
+      console.log("Starting Google Sheets update...");
+      await updateGoogleSheetsForTariffs(today);
+
+      console.log("All updates completed");
+    } catch (error) {
+      console.error("Error in scheduled task:", error);
+    }
+  });
+
+  console.log("Scheduler started");
+}
+
+export default startScheduler;
+```
+
+---
+
+# 6. Основной файл `app.ts`
+
+```ts
+import knex, { migrate, seed } from "#postgres/knex";
+import startScheduler from "./scheduler";
+
+async function main() {
+  await migrate.latest();
+  await seed.run();
+
+  console.log("Migrations and seeds completed");
+
+  // Запускаем планировщик
+  startScheduler();
+}
+
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
+```
+
+---
+
+# 7. Dockerfile и docker-compose
+
+Убедитесь, что у вас в `Dockerfile` и `docker-compose.yml` правильно настроены env переменные, включая:
+
+- POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD
+- GOOGLE_SHEETS_CREDENTIALS (JSON сервисного аккаунта)
+- Другие необходимые переменные.
+
+---
+
+# Итог
+
+- Миграция создает таблицу тарифов.
+- Сервис скачивает тарифы с Wildberries и сохраняет их в БД.
+- Сервис обновляет Google Sheets по списку id таблиц.
+- Планировщик запускает эти задачи по расписанию.
+- Используется Knex.js для работы с PostgreSQL.
+- Все типы на TypeScript.
+
+---
+
+Если нужно, могу помочь с конкретными частями — например, с миграциями, настройкой Google API, или тестами.  
+Напишите, если хотите пример docker-compose или помощь с OAuth2 для Google Sheets.
+
+
+Спасибо за предоставленные `.env`, `docker-compose.yml` и `Dockerfile`. Проверим и подкорректируем, чтобы всё работало корректно.
+
+---
+
+## 1. Переменные окружения
+
+В вашем `.env`:
+
+```env
+POSTGRES_PORT=5432
+POSTGRES_DB=postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+
+APP_PORT=5000
+
+JWT_SECRET=eyJhbGciOiJFUzI1NiIsImtpZCI6IjIwMjUwNTIwdjEiLCJ0eXAiOiJKV1QifQ.eyJlbnQiOjEsImV4cCI6MTc2NTY3MDIyOSwiaWQiOiIwMTk3NmU0Yy1mZTgwLTc1NDAtODkyMi02NGE5ZWUzYTU4MzYiLCJpaWQiOjQ1OTExNjA5LCJvaWQiOjExMzA0NiwicyI6MTA3Mzc0MTgzMiwic2lkIjoiOTMyYzE3NmEtNTA4NS01YzZmLWJjMzMtNGU4NGNkZjU4ZDdlIiwidCI6ZmFsc2UsInVpZCI6NDU5MTE2MDl9.wDoH8FLdZu1049uPCmhx3UHaw28YJB-CylWeD2LgkpRZFIMlOsUlnlVmfmYKy__JWNjfbDkOtdJ69QpSD5EKag
+```
+
+**Рекомендация:**  
+- Добавьте переменную `POSTGRES_HOST=postgres` (т.к. в `docker-compose` хост базы — это имя сервиса `postgres`).  
+- Добавьте переменную `GOOGLE_SHEETS_CREDENTIALS` с JSON сервисного аккаунта Google в одну строку (экранируйте кавычки или используйте файл и монтируйте в контейнер).  
+- Добавьте `APP_PORT=5000` (уже есть).
+
+---
+
+## 2. docker-compose.yml (вы назвали `compose.yaml`)
+
+Ваша часть `services` для `postgres` и `app` в целом выглядит хорошо. Несколько замечаний:
+
+- В `postgres`:
+
+  ```yaml
+  environment:
+    - PGPORT=${POSTGRES_PORT}
+    - POSTGRES_DB=${POSTGRES_DB}
+    - POSTGRES_USER=${POSTGRES_USER}
+    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    - PGDATA=/var/lib/postgresql/data/pgdata
+  ```
+
+  Здесь `PGPORT` — это переменная окружения PostgreSQL? Обычно используется `POSTGRES_PORT`. Но в официальном образе `postgres` порт задаётся через `-p` в `ports`, а не через env.  
+  Можно убрать `PGPORT` или заменить на `POSTGRES_PORT`.
+
+- В `app`:
+
+  ```yaml
+  environment:
+    POSTGRES_HOST: postgres
+    POSTGRES_PORT: ${POSTGRES_PORT}
+    POSTGRES_DB: ${POSTGRES_DB}
+    POSTGRES_USER: ${POSTGRES_USER}
+    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    PORT: ${APP_PORT}
+    NODE_ENV: production
+    JWT_SECRET: ${JWT_SECRET}
+  ```
+
+  Всё корректно, только добавьте `GOOGLE_SHEETS_CREDENTIALS` сюда, если используете env переменную.
+
+- Порты:
+
+  ```yaml
+  ports:
+    - "5001:5000"
+  ```
+
+  Это значит, что снаружи будет доступен порт 5001, а внутри контейнера приложение слушает 5000 (согласно `APP_PORT`).
+
+---
+
+## 3. Dockerfile
+
+Ваш `Dockerfile` выглядит хорошо и оптимально:
+
+- `deps-prod` — установка зависимостей без devDependencies.
+- `build` — установка devDependencies + сборка.
+- `prod` — копирование только нужного для запуска.
+
+**Рекомендация:**  
+В `prod` образе нет копирования `.env` или других файлов конфигурации. Если вы хотите использовать `.env` внутри контейнера, лучше передавать переменные через `docker-compose` (что вы и делаете).
+
+---
+
+## 4. Резюме и пример доработок
+
+### .env (пример)
+
+```env
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+
+APP_PORT=5000
+
+JWT_SECRET=eyJhbGciOiJFUzI1NiIsImtpZCI6IjIwMjUwNTIwdjEiLCJ0eXAiOiJKV1QifQ.eyJlbnQiOjEsImV4cCI6MTc2NTY3MDIyOSwiaWQiOiIwMTk3NmU0Yy1mZTgwLTc1NDAtODkyMi02NGE5ZWUzYTU4MzYiLCJpaWQiOjQ1OTExNjA5LCJvaWQiOjExMzA0NiwicyI6MTA3Mzc0MTgzMiwic2lkIjoiOTMyYzE3NmEtNTA4NS01YzZmLWJjMzMtNGU4NGNkZjU4ZDdlIiwidCI6ZmFsc2UsInVpZCI6NDU5MTE2MDl9.wDoH8FLdZu1049uPCmhx3UHaw28YJB-CylWeD2LgkpRZFIMlOsUlnlVmfmYKy__JWNjfbDkOtdJ69QpSD5EKag
+
+GOOGLE_SHEETS_CREDENTIALS={"type":"service_account","project_id":"...","private_key_id":"...","private_key":"-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n","client_email":"...","client_id":"...","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url":"..."}
+```
+
+> Внимание: JSON сервисного аккаунта нужно записать в одну строку, экранируя переносы `\n` и кавычки.
+
+---
+
+### docker-compose.yml (с доработками)
+
+```yaml
+version: "3.9"
+
+networks:
+  postgres-net:
+    driver: bridge
+
+volumes:
+  postgres-vol:
+    driver: local
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:16.1-alpine
+    environment:
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres-vol:/var/lib/postgresql/data
+    networks:
+      - postgres-net
+    expose:
+      - ${POSTGRES_PORT}
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  app:
+    container_name: app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PORT: ${APP_PORT}
+      NODE_ENV: production
+      JWT_SECRET: ${JWT_SECRET}
+      GOOGLE_SHEETS_CREDENTIALS: ${GOOGLE_SHEETS_CREDENTIALS}
+    ports:
+      - "5001:${APP_PORT}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - postgres-net
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: 5
+    command: ["npm", "run", "start"]
+    restart: unless-stopped
+```
+
+---
+
+## 5. Дополнительные советы
+
+- Для Google Sheets credentials лучше монтировать json файл в контейнер и читать из файла, чтобы не хранить длинный JSON в переменной окружения. Например:
+
+```yaml
+volumes:
+  - ./google-credentials.json:/app/google-credentials.json:ro
+```
+
+- В коде инициализации Google API использовать чтение из файла:
+
+```ts
+import { google } from "googleapis";
+import path from "path";
+
+const auth = new google.auth.GoogleAuth({
+  keyFile: path.join(__dirname, "../google-credentials.json"),
+  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+});
+```
+
+- Убедитесь, что в вашем TypeScript коде переменные окружения читаются через `process.env.POSTGRES_HOST` и т.п.
+
+---
+
+Если нужно, могу помочь с примером чтения Google credentials из файла или с настройкой Docker для этого.  
+Также могу помочь проверить, что приложение корректно подключается к базе и Google Sheets.
+
+
+
+
+Спасибо за предоставленные `.env`, `docker-compose.yml` и `Dockerfile`. Проверим и подкорректируем, чтобы всё работало корректно.
+
+---
+
+## 1. Переменные окружения
+
+В вашем `.env`:
+
+```env
+POSTGRES_PORT=5432
+POSTGRES_DB=postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+
+APP_PORT=5000
+
+JWT_SECRET=eyJhbGciOiJFUzI1NiIsImtpZCI6IjIwMjUwNTIwdjEiLCJ0eXAiOiJKV1QifQ.eyJlbnQiOjEsImV4cCI6MTc2NTY3MDIyOSwiaWQiOiIwMTk3NmU0Yy1mZTgwLTc1NDAtODkyMi02NGE5ZWUzYTU4MzYiLCJpaWQiOjQ1OTExNjA5LCJvaWQiOjExMzA0NiwicyI6MTA3Mzc0MTgzMiwic2lkIjoiOTMyYzE3NmEtNTA4NS01YzZmLWJjMzMtNGU4NGNkZjU4ZDdlIiwidCI6ZmFsc2UsInVpZCI6NDU5MTE2MDl9.wDoH8FLdZu1049uPCmhx3UHaw28YJB-CylWeD2LgkpRZFIMlOsUlnlVmfmYKy__JWNjfbDkOtdJ69QpSD5EKag
+```
+
+**Рекомендация:**  
+- Добавьте переменную `POSTGRES_HOST=postgres` (т.к. в `docker-compose` хост базы — это имя сервиса `postgres`).  
+- Добавьте переменную `GOOGLE_SHEETS_CREDENTIALS` с JSON сервисного аккаунта Google в одну строку (экранируйте кавычки или используйте файл и монтируйте в контейнер).  
+- Добавьте `APP_PORT=5000` (уже есть).
+
+---
+
+## 2. docker-compose.yml (вы назвали `compose.yaml`)
+
+Ваша часть `services` для `postgres` и `app` в целом выглядит хорошо. Несколько замечаний:
+
+- В `postgres`:
+
+  ```yaml
+  environment:
+    - PGPORT=${POSTGRES_PORT}
+    - POSTGRES_DB=${POSTGRES_DB}
+    - POSTGRES_USER=${POSTGRES_USER}
+    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    - PGDATA=/var/lib/postgresql/data/pgdata
+  ```
+
+  Здесь `PGPORT` — это переменная окружения PostgreSQL? Обычно используется `POSTGRES_PORT`. Но в официальном образе `postgres` порт задаётся через `-p` в `ports`, а не через env.  
+  Можно убрать `PGPORT` или заменить на `POSTGRES_PORT`.
+
+- В `app`:
+
+  ```yaml
+  environment:
+    POSTGRES_HOST: postgres
+    POSTGRES_PORT: ${POSTGRES_PORT}
+    POSTGRES_DB: ${POSTGRES_DB}
+    POSTGRES_USER: ${POSTGRES_USER}
+    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    PORT: ${APP_PORT}
+    NODE_ENV: production
+    JWT_SECRET: ${JWT_SECRET}
+  ```
+
+  Всё корректно, только добавьте `GOOGLE_SHEETS_CREDENTIALS` сюда, если используете env переменную.
+
+- Порты:
+
+  ```yaml
+  ports:
+    - "5001:5000"
+  ```
+
+  Это значит, что снаружи будет доступен порт 5001, а внутри контейнера приложение слушает 5000 (согласно `APP_PORT`).
+
+---
+
+## 3. Dockerfile
+
+Ваш `Dockerfile` выглядит хорошо и оптимально:
+
+- `deps-prod` — установка зависимостей без devDependencies.
+- `build` — установка devDependencies + сборка.
+- `prod` — копирование только нужного для запуска.
+
+**Рекомендация:**  
+В `prod` образе нет копирования `.env` или других файлов конфигурации. Если вы хотите использовать `.env` внутри контейнера, лучше передавать переменные через `docker-compose` (что вы и делаете).
+
+---
+
+## 4. Резюме и пример доработок
+
+### .env (пример)
+
+```env
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+
+APP_PORT=5000
+
+JWT_SECRET=eyJhbGciOiJFUzI1NiIsImtpZCI6IjIwMjUwNTIwdjEiLCJ0eXAiOiJKV1QifQ.eyJlbnQiOjEsImV4cCI6MTc2NTY3MDIyOSwiaWQiOiIwMTk3NmU0Yy1mZTgwLTc1NDAtODkyMi02NGE5ZWUzYTU4MzYiLCJpaWQiOjQ1OTExNjA5LCJvaWQiOjExMzA0NiwicyI6MTA3Mzc0MTgzMiwic2lkIjoiOTMyYzE3NmEtNTA4NS01YzZmLWJjMzMtNGU4NGNkZjU4ZDdlIiwidCI6ZmFsc2UsInVpZCI6NDU5MTE2MDl9.wDoH8FLdZu1049uPCmhx3UHaw28YJB-CylWeD2LgkpRZFIMlOsUlnlVmfmYKy__JWNjfbDkOtdJ69QpSD5EKag
+
+GOOGLE_SHEETS_CREDENTIALS={"type":"service_account","project_id":"...","private_key_id":"...","private_key":"-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n","client_email":"...","client_id":"...","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url":"..."}
+```
+
+> Внимание: JSON сервисного аккаунта нужно записать в одну строку, экранируя переносы `\n` и кавычки.
+
+---
+
+### docker-compose.yml (с доработками)
+
+```yaml
+version: "3.9"
+
+networks:
+  postgres-net:
+    driver: bridge
+
+volumes:
+  postgres-vol:
+    driver: local
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:16.1-alpine
+    environment:
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres-vol:/var/lib/postgresql/data
+    networks:
+      - postgres-net
+    expose:
+      - ${POSTGRES_PORT}
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  app:
+    container_name: app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PORT: ${APP_PORT}
+      NODE_ENV: production
+      JWT_SECRET: ${JWT_SECRET}
+      GOOGLE_SHEETS_CREDENTIALS: ${GOOGLE_SHEETS_CREDENTIALS}
+    ports:
+      - "5001:${APP_PORT}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - postgres-net
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: 5
+    command: ["npm", "run", "start"]
+    restart: unless-stopped
+```
+
+---
+
+## 5. Дополнительные советы
+
+- Для Google Sheets credentials лучше монтировать json файл в контейнер и читать из файла, чтобы не хранить длинный JSON в переменной окружения. Например:
+
+```yaml
+volumes:
+  - ./google-credentials.json:/app/google-credentials.json:ro
+```
+
+- В коде инициализации Google API использовать чтение из файла:
+
+```ts
+import { google } from "googleapis";
+import path from "path";
+
+const auth = new google.auth.GoogleAuth({
+  keyFile: path.join(__dirname, "../google-credentials.json"),
+  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+});
+```
+
+- Убедитесь, что в вашем TypeScript коде переменные окружения читаются через `process.env.POSTGRES_HOST` и т.п.
+
+---
+
+Если нужно, могу помочь с примером чтения Google credentials из файла или с настройкой Docker для этого.  
+Также могу помочь проверить, что приложение корректно подключается к базе и Google Sheets.
+
+Понял, что у вас пока нет реальных ключей Google Sheets, и вы для отладки указали в `.env`:
+
+```env
+GOOGLE_SHEETS_CREDENTIALS='any'
+```
+
+---
+
+### Что важно знать и делать в таком случае:
+
+1. **Передача переменной GOOGLE_SHEETS_CREDENTIALS с фиктивным значением — допустима для разработки**, но при попытке обращения к Google Sheets API приложение, скорее всего, упадёт с ошибкой аутентификации.
+
+2. **Если вы не используете Google Sheets API сейчас, то можно временно убрать эту переменную из `docker-compose.yml` и кода**, чтобы не было ошибок.
+
+3. **Если код ожидает переменную `GOOGLE_SHEETS_CREDENTIALS` — можно передать заглушку, но лучше в коде предусмотреть обработку отсутствия реальных ключей**, например:
+
+```ts
+const googleSheetsCreds = process.env.GOOGLE_SHEETS_CREDENTIALS;
+
+if (!googleSheetsCreds || googleSheetsCreds === 'any') {
+  console.warn('Google Sheets credentials not provided, skipping API initialization');
+  // не инициализируем Google API
+} else {
+  // инициализация Google API с реальными creds
+}
+```
+
+4. **В `docker-compose.yml` можно оставить переменную, как есть:**
+
+```yaml
+environment:
+  ...
+  GOOGLE_SHEETS_CREDENTIALS: ${GOOGLE_SHEETS_CREDENTIALS}
+```
+
+а в `.env`:
+
+```env
+GOOGLE_SHEETS_CREDENTIALS=any
+```
+
+(без кавычек, чтобы не попадали в значение).
+
+---
+
+### Итог:
+
+- Для работы с Google Sheets нужен реальный JSON сервисного аккаунта.  
+- Пока его нет — можно передавать заглушку или не передавать переменную вовсе.  
+- В коде нужно предусмотреть обработку отсутствия валидных ключей, чтобы приложение не падало.  
+- Как только получите ключи — замените `GOOGLE_SHEETS_CREDENTIALS` в `.env` на настоящий JSON (в одну строку, с экранированием).
+
+Если хотите, могу помочь написать пример кода, который безопасно обрабатывает отсутствие ключей и инициализирует Google API только при наличии валидных данных.
+
+
+Отлично, что вы поставили заглушку в виде JSON с ключами — это лучше, чем просто `'any'`, потому что структура похожа на реальную.
+
+Однако, чтобы всё работало корректно, обратите внимание на несколько важных моментов:
+
+---
+
+### 1. Формат переменной окружения GOOGLE_SHEETS_CREDENTIALS
+
+Переменная должна содержать **валидный JSON в одну строку** с корректным экранированием, особенно для многострочного поля `private_key`.
+
+Пример (упрощённый):
+
+```env
+GOOGLE_SHEETS_CREDENTIALS={"type":"service_account","project_id":"my-project","private_key_id":"abc123","private_key":"-----BEGIN PRIVATE KEY-----\\nMIIEv...\\n-----END PRIVATE KEY-----\\n","client_email":"my-email@my-project.iam.gserviceaccount.com","client_id":"1234567890","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url":"https://www.googleapis.com/robot/v1/metadata/x509/my-email%40my-project.iam.gserviceaccount.com"}
+```
+
+Обратите внимание:
+
+- Переносы строки в `private_key` заменены на `\\n` (двойной слэш + n), чтобы корректно передавать в env.
+
+- В `.env` **не используйте одинарные или двойные кавычки вокруг всего JSON**, иначе они попадут в значение переменной.
+
+---
+
+### 2. Как использовать в коде
+
+В коде вы можете распарсить JSON из переменной окружения:
+
+```ts
+let googleSheetsCredentials;
+
+try {
+  googleSheetsCredentials = JSON.parse(process.env.GOOGLE_SHEETS_CREDENTIALS || '{}');
+} catch (e) {
+  console.error('Failed to parse GOOGLE_SHEETS_CREDENTIALS:', e);
+  googleSheetsCredentials = null;
+}
+
+if (googleSheetsCredentials && googleSheetsCredentials.type === 'service_account') {
+  // Инициализируем Google API с этими ключами
+} else {
+  console.warn('Google Sheets credentials not valid or missing, skipping initialization');
+}
+```
+
+---
+
+### 3. Если у вас пока нет реальных ключей
+
+- Можно оставить фиктивные данные, но Google API вызовы будут падать с ошибкой аутентификации.
+
+- Для разработки можно заглушить вызовы Google Sheets API, чтобы приложение не падало.
+
+---
+
+### 4. Вывод
+
+- Проверьте, что в `.env` переменная `GOOGLE_SHEETS_CREDENTIALS` записана корректно (одна строка, экранирование `\n` как `\\n`).
+
+- В коде обязательно парсите JSON и обрабатывайте ошибки.
+
+- При реальном использовании замените заглушку на настоящий JSON сервисного аккаунта.
+
+---
+
+Если нужно, могу помочь с примером скрипта, который подготавливает JSON из файла в строку для `.env`, или с примером кода инициализации Google Sheets API.
