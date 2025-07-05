@@ -1,15 +1,38 @@
 import axios from "axios";
+import dotenv from "dotenv";
 import knex from "#postgres/knex";
 import { Tariff } from "#types/tariffs";
+dotenv.config();
 
+// аддресс
 const WB_TARIFFS_URL = "https://common-api.wildberries.ru/api/v1/tariffs/box";
+const token = process.env.JWT_SECRET;
 
+/**
+ * Получает тарифы из публичного API Wildberries.
+ * @returns {Promise<Tariff[]>} Массив тарифов.
+ */
 export async function fetchTariffsFromWB(): Promise<Tariff[]> {
-  const response = await axios.get(WB_TARIFFS_URL);
+  if (!token) {
+    throw new Error(
+      "JWT token is not defined in environment variable JWT_SECRET"
+    );
+  }
+  const response = await axios.get(WB_TARIFFS_URL, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   // Предполагаем, что API возвращает массив тарифов в response.data
   return response.data;
 }
 
+/**
+ * Сохраняет тарифы в базу данных для указанной даты.
+ * Использует upsert (ON CONFLICT) для вставки или обновления записей.
+ * @param {Tariff[]} tariffs - Массив тарифов для сохранения.
+ * @param {Date} date - Дата, на которую сохраняются тарифы (только дата без времени).
+ */
 export async function saveTariffsToDB(
   tariffs: Tariff[],
   date: Date
@@ -34,6 +57,10 @@ export async function saveTariffsToDB(
   }
 }
 
+/**
+ * Обновляет тарифы: получает актуальные данные из Wildberries и сохраняет их в базу на текущую дату.
+ * По завершении выводит сообщение в консоль.
+ */
 export async function updateTariffs(): Promise<void> {
   const tariffs = await fetchTariffsFromWB();
   const today = new Date();

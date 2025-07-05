@@ -1425,3 +1425,623 @@ const dbHost = process.env.POSTGRES_HOST || 'localhost';
 ---
 
 Если хотите, могу помочь с примером такой конфигурации или проверить код по задачам — дайте знать!
+
+Этот сервис работает с тарифами Wildberries и реализует следующие основные методы:
+
+1. **fetchTariffsFromWB()**  
+   - Делает HTTP GET-запрос к публичному API Wildberries по адресу `https://common-api.wildberries.ru/api/v1/tariffs/box`.  
+   - Получает и возвращает массив тарифов (`Tariff[]`), которые приходят в ответе от API.
+
+2. **saveTariffsToDB(tariffs, date)**  
+   - Принимает массив тарифов и дату.  
+   - Для каждого тарифа сохраняет или обновляет запись в таблице `tariffs` базы данных PostgreSQL с помощью `knex`.  
+   - Использует UPSERT (через `ON CONFLICT` по уникальному ключу `tariff_id` и `date`), чтобы при совпадении обновлять существующие данные, иначе вставлять новые.  
+   - Сохраняет поля: `tariff_id`, `name`, `price`, `raw_data` (исходные данные в JSON), дату и время последнего обновления.
+
+3. **updateTariffs()**  
+   - Основная функция обновления тарифов.  
+   - Вызывает `fetchTariffsFromWB()` для получения актуальных тарифов.  
+   - Формирует текущую дату без времени (только год-месяц-день).  
+   - Вызывает `saveTariffsToDB()` для сохранения тарифов в базу с этой датой.  
+   - Логирует сообщение об успешном обновлении тарифов на текущую дату.
+
+---
+
+### В итоге
+
+Сервис регулярно получает актуальные тарифы Wildberries через API, сохраняет их в базу данных с отметкой по дате, обновляя существующие записи при необходимости. Это позволяет хранить историю тарифов по датам и иметь доступ к актуальным данным для дальнейшей работы.
+
+я правильно понимаю что он получил данные от этого ключа const WB_TARIFFS_URL = "https://common-api.wildberries.ru/api/v1/tariffs/box";и от сюда ведет проверку ? так 
+
+Да, вы правильно понимаете.
+
+- Константа `WB_TARIFFS_URL = "https://common-api.wildberries.ru/api/v1/tariffs/box"` — это URL публичного API Wildberries, откуда сервис получает данные о тарифах.
+- Метод `fetchTariffsFromWB()` делает запрос именно по этому адресу и получает актуальные тарифы.
+- Далее сервис сохраняет или обновляет эти тарифы в базе данных, чтобы иметь актуальную и историческую информацию.
+
+Таким образом, именно с этого URL сервис получает исходные данные для своей работы и "ведёт проверку" (то есть обновляет тарифы в базе) на основе этих данных.
+
+Хороший вопрос!
+
+---
+
+## Почему `JWT_SECRET` из `.env` не используется в вашем коде с тарифами?
+
+В приведённом вами коде сервиса, который работает с тарифами Wildberries, **переменная `JWT_SECRET` вообще не используется**.
+
+- Код только делает HTTP-запрос к публичному API Wildberries по URL `https://common-api.wildberries.ru/api/v1/tariffs/box` — там, судя по всему, **не требуется авторизация или токен**.
+- В коде нет никаких мест, где бы использовался JWT или заголовки авторизации с этим секретом.
+
+---
+
+## Где и как обычно используется `JWT_SECRET`
+
+- `JWT_SECRET` — это секретный ключ для подписи и проверки JWT-токенов (JSON Web Tokens).
+- Обычно он применяется в сервисах, которые реализуют **аутентификацию и авторизацию пользователей**.
+- Например, при логине сервер генерирует JWT с помощью этого секрета, а при последующих запросах проверяет подпись токена.
+- В вашем проекте `JWT_SECRET` может использоваться в другом модуле, например, в API-сервере, который обслуживает пользователей, защищает маршруты, выдаёт токены и т.п.
+
+---
+
+## Что делать, если хотите использовать `JWT_SECRET`
+
+- Убедитесь, что в коде, который работает с JWT (например, в middleware аутентификации или в модуле авторизации), есть импорт и чтение переменной окружения `process.env.JWT_SECRET`.
+- Пример использования (Node.js с библиотекой jsonwebtoken):
+
+```ts
+import jwt from "jsonwebtoken";
+
+const secret = process.env.JWT_SECRET;
+
+function verifyToken(token: string) {
+  try {
+    return jwt.verify(token, secret);
+  } catch (err) {
+    throw new Error("Invalid token");
+  }
+}
+```
+
+---
+
+## Кратко по остальным переменным из `.env`
+
+- `POSTGRES_*` — параметры подключения к базе данных (порт, имя базы, пользователь, пароль, хост).
+- `APP_PORT` — порт, на котором запускается ваше приложение.
+- `JWT_SECRET` — секрет для подписи JWT, используется в модулях аутентификации.
+
+---
+
+## Итог
+
+- В вашем сервисе получения и сохранения тарифов `JWT_SECRET` не нужен и не используется.
+- `JWT_SECRET` нужен в тех частях приложения, где реализована работа с JWT (авторизация, аутентификация).
+- Если в проекте есть такие части — там и надо подключать `JWT_SECRET` из `.env`.
+
+Если хотите, могу помочь с примером кода для работы с JWT или объяснить, как интегрировать авторизацию в ваш проект.
+
+Спасибо за уточнение задачи. Исходя из вашего описания, давайте разберём, что должен делать сервис и как к этому относится файл с переменными и кодом.
+
+---
+
+## Задачи сервиса
+
+1. **Регулярное получение тарифов Wildberries (каждые 12 часов)**  
+   - Делать запрос к публичному API по адресу `https://common-api.wildberries.ru/api/v1/tariffs/box`.  
+   - Сохранять полученные тарифы в PostgreSQL с отметкой даты (по дням).
+
+2. **Регулярное обновление информации в Google-таблицах (каждые 6 часов)**  
+   - Извлекать данные из PostgreSQL.  
+   - Обновлять данные в Google Sheets по их идентификаторам (таблиц может быть несколько).  
+   - Для работы с Google Sheets потребуется авторизация через Google API.
+
+---
+
+## Отношение переменной `JWT_SECRET` к задаче
+
+- Ваша задача не требует авторизации при получении тарифов Wildberries — API публичный, поэтому `JWT_SECRET` для этого не нужен.
+- Однако для работы с Google Sheets обычно требуется OAuth 2.0 или сервисный аккаунт, где используются ключи и токены — возможно, в вашем проекте `JWT_SECRET` задуман как секрет для подписи JWT, если реализована внутренняя авторизация или аутентификация сервисов.
+- Если в проекте нет авторизации пользователей и нет JWT-авторизации, то `JWT_SECRET` может быть лишним или предназначенным для будущих расширений.
+
+---
+
+## Что должно быть реализовано дополнительно для Google Sheets
+
+- Модуль, который по расписанию (например, с помощью `node-cron` или другого планировщика) каждые 6 часов:  
+  - Читает актуальные тарифы из PostgreSQL.  
+  - Подключается к Google Sheets API с использованием Google credentials (OAuth 2.0 или сервисный аккаунт).  
+  - Обновляет данные в нужных таблицах по их идентификаторам.
+
+- Для этого обычно нужна отдельная конфигурация с ключами доступа Google, которые могут храниться в `.env` или в отдельных JSON-файлах.
+
+---
+
+## Работа с Docker и переменными окружения
+
+- В Docker Compose вы правильно передаёте параметры подключения к базе (`POSTGRES_HOST`, `POSTGRES_USER`, `POSTGRES_PASSWORD` и т.п.).
+- Переменная `JWT_SECRET` должна быть передана в контейнер, если она действительно используется в коде (например, для авторизации).
+- Если `JWT_SECRET` не используется, её можно убрать или оставить для будущих задач.
+
+---
+
+## Итог — что должно быть в вашем проекте
+
+- **Модуль для получения тарифов WB по URL и сохранения в PostgreSQL (каждые 12 часов).**  
+  Ваш текущий код с `fetchTariffsFromWB` и `saveTariffsToDB` соответствует этому.
+
+- **Модуль для обновления Google Sheets (каждые 6 часов).**  
+  Этот модуль нужно реализовать отдельно, используя Google API и данные из базы.
+
+- **Планировщик задач (cron или аналог) для запуска этих операций по расписанию.**
+
+- **Правильное использование переменных окружения:**  
+  - DB-параметры — для подключения к PostgreSQL.  
+  - Google API credentials — для доступа к Google Sheets.  
+  - JWT_SECRET — только если у вас есть JWT-авторизация.
+
+---
+Ваши комментарии по смыслу понятны и отражают логику функций, но их можно сделать более лаконичными, стилистически единообразными и чуть более формальными — это улучшит читаемость и поддержку кода, особенно в командной разработке.
+
+Вот пример, как можно отрефакторить ваши комментарии, сохранив суть, но сделав их более «каноничными» для TypeScript/JavaScript:
+
+```ts
+import axios from "axios";
+import knex from "#postgres/knex";
+import { Tariff } from "#types/tariffs";
+
+const WB_TARIFFS_URL = "https://common-api.wildberries.ru/api/v1/tariffs/box";
+
+/**
+ * Fetches tariffs from Wildberries public API.
+ * @returns {Promise<Tariff[]>} Array of tariffs.
+ */
+export async function fetchTariffsFromWB(): Promise<Tariff[]> {
+  const response = await axios.get(WB_TARIFFS_URL);
+  return response.data; // предполагается, что API возвращает массив тарифов
+}
+
+/**
+ * Saves tariffs into the database for a given date.
+ * Uses upsert (ON CONFLICT) to insert or update existing records.
+ * @param {Tariff[]} tariffs - Array of tariffs to save.
+ * @param {Date} date - Date for which tariffs are saved (date only, no time).
+ */
+export async function saveTariffsToDB(
+  tariffs: Tariff[],
+  date: Date
+): Promise<void> {
+  for (const tariff of tariffs) {
+    await knex("tariffs")
+      .insert({
+        tariff_id: tariff.tariff_id,
+        name: tariff.name,
+        price: tariff.price,
+        raw_data: JSON.stringify(tariff),
+        date,
+      })
+      .onConflict(["tariff_id", "date"])
+      .merge({
+        name: tariff.name,
+        price: tariff.price,
+        raw_data: JSON.stringify(tariff),
+        updated_at: knex.fn.now(),
+      });
+  }
+}
+
+/**
+ * Fetches latest tariffs from Wildberries and saves them to DB for today's date.
+ * Logs a message on completion.
+ */
+export async function updateTariffs(): Promise<void> {
+  const tariffs = await fetchTariffsFromWB();
+  const today = new Date();
+  const dateString = today.toISOString().split("T")[0]; // yyyy-mm-dd
+  await saveTariffsToDB(tariffs, new Date(dateString));
+  console.log(`Tariffs updated for date ${dateString}`);
+}
+```
+
+---
+
+### Рекомендации:
+
+- Используйте JSDoc-стиль комментариев `/** ... */` для описания функций и параметров — это удобно для IDE и автогенерации документации.
+- Избегайте излишне разговорных формулировок, лучше формулируйте кратко и по делу.
+- Объясняйте, что делает функция, что ожидает на входе и что возвращает.
+- В теле функций комментарии нужны только если логика не очевидна.
+
+---
+
+Да, в моём примере использован формат JSDoc — это комментарии в виде блоков `/** ... */` с описанием функции, параметров и возвращаемого значения. Такой стиль хорошо поддерживается редакторами и инструментами документации.
+
+Ниже пример тех же комментариев, но на русском языке и в формате JSDoc:
+
+```ts
+import axios from "axios";
+import knex from "#postgres/knex";
+import { Tariff } from "#types/tariffs";
+
+const WB_TARIFFS_URL = "https://common-api.wildberries.ru/api/v1/tariffs/box";
+
+/**
+ * Получает тарифы из публичного API Wildberries.
+ * @returns {Promise<Tariff[]>} Массив тарифов.
+ */
+export async function fetchTariffsFromWB(): Promise<Tariff[]> {
+  const response = await axios.get(WB_TARIFFS_URL);
+  return response.data; // предполагается, что API возвращает массив тарифов
+}
+
+/**
+ * Сохраняет тарифы в базу данных для указанной даты.
+ * Использует upsert (ON CONFLICT) для вставки или обновления записей.
+ * @param {Tariff[]} tariffs - Массив тарифов для сохранения.
+ * @param {Date} date - Дата, на которую сохраняются тарифы (только дата без времени).
+ */
+export async function saveTariffsToDB(
+  tariffs: Tariff[],
+  date: Date
+): Promise<void> {
+  for (const tariff of tariffs) {
+    await knex("tariffs")
+      .insert({
+        tariff_id: tariff.tariff_id,
+        name: tariff.name,
+        price: tariff.price,
+        raw_data: JSON.stringify(tariff),
+        date,
+      })
+      .onConflict(["tariff_id", "date"])
+      .merge({
+        name: tariff.name,
+        price: tariff.price,
+        raw_data: JSON.stringify(tariff),
+        updated_at: knex.fn.now(),
+      });
+  }
+}
+
+/**
+ * Обновляет тарифы: получает актуальные данные из Wildberries и сохраняет их в базу на текущую дату.
+ * По завершении выводит сообщение в консоль.
+ */
+export async function updateTariffs(): Promise<void> {
+  const tariffs = await fetchTariffsFromWB();
+  const today = new Date();
+  const dateString = today.toISOString().split("T")[0]; // yyyy-mm-dd
+  await saveTariffsToDB(tariffs, new Date(dateString));
+  console.log(`Tariffs updated for date ${dateString}`);
+}
+```
+
+Такой стиль комментариев понятен, формален и удобен для поддержки. Если хотите — могу помочь с генерацией документации или интеграцией с IDE.
+
+
+Давайте по порядку.
+
+---
+
+### 1. Обновление тарифов каждые 12 часов
+
+В вашем текущем коде:
+
+```ts
+const dateString = today.toISOString().split("T")[0]; // yyyy-mm-dd
+await saveTariffsToDB(tariffs, new Date(dateString));
+```
+
+вы сохраняете тарифы **по дате без времени**, то есть фактически один раз в день. Если хотите обновлять тарифы **каждые 12 часов**, то нужно:
+
+- Либо сохранять дату с точностью до времени (например, дата + время в часах),
+- Либо использовать планировщик задач (cron, node-cron, или системный cron) чтобы запускать функцию `updateTariffs` каждые 12 часов.
+
+**Где это делается?**
+
+- Запускать периодически функцию `updateTariffs` нужно вне этого скрипта — обычно в отдельном сервисе, планировщике задач или в процессе, который работает постоянно.
+- В самом скрипте вы просто реализуете логику получения и сохранения тарифов.
+
+**Пример запуска каждые 12 часов с node-cron:**
+
+```ts
+import cron from 'node-cron';
+
+cron.schedule('0 */12 * * *', async () => {
+  await updateTariffs();
+  console.log('Tariffs updated every 12 hours');
+});
+```
+
+Это запускает `updateTariffs` в 0 минут каждого 12-го часа (например, в 00:00 и 12:00).
+
+---
+
+### 2. Ошибка 401 Unauthorized и заголовок Authorization
+
+Ответ с ошибкой:
+
+```json
+{
+  "title": "unauthorized",
+  "detail": "empty Authorization header",
+  "code": "...",
+  "status": 401,
+  "statusText": "Unauthorized"
+}
+```
+
+означает, что API требует **авторизационный заголовок** — вы должны передавать токен или ключ в HTTP заголовке `Authorization`.
+
+Пример, как добавить заголовок в axios:
+
+```ts
+const response = await axios.get(WB_TARIFFS_URL, {
+  headers: {
+    Authorization: 'Bearer YOUR_ACCESS_TOKEN_HERE'
+  }
+});
+```
+
+Или, если API требует другой формат, то согласно документации.
+
+---
+
+### 3. Про объект из API и объект для сохранения в БД
+
+Вы показали пример объекта ошибки от API, он не похож на тарифы, которые вы сохраняете.
+
+- **Объект из API** — это данные, которые вы получаете (тарифы).
+- **Объект, который вы сохраняете в БД** — это ваша внутренняя структура, куда вы кладёте нужные поля из полученных тарифов.
+
+То есть:
+
+- Объекты, которые вы сохраняете в `saveTariffsToDB`, должны соответствовать структуре таблицы `tariffs`.
+- Объекты, которые вы получаете от API, могут иметь другую структуру.
+
+Вы **не должны** сохранять в БД объект ошибки API. Если пришла ошибка 401 — нужно обработать её отдельно (например, выбросить исключение, залогировать и прервать сохранение).
+
+---
+
+### Итог:
+
+- Для запуска обновления каждые 12 часов используйте внешний планировщик (cron, node-cron и т.п.).
+- В запросе к API добавьте заголовок Authorization с токеном.
+- Обрабатывайте ошибки API отдельно, не сохраняйте объекты ошибок в базу.
+- В `saveTariffsToDB` сохраняйте только корректные объекты тарифов, соответствующие вашей таблице.
+
+---
+
+Если хотите, могу помочь написать пример с авторизацией в axios и пример с node-cron для запуска по расписанию.
+
+
+Спасибо за уточнение!
+
+---
+
+### Несколько важных моментов по вашему JWT_SECRET из `.env`
+
+1. **JWT_SECRET — это обычно секретный ключ для генерации или проверки JWT-токенов на вашем сервере**, а не сам токен для авторизации в API.
+
+2. Чтобы авторизоваться в API Wildberries, вам нужен **сам JWT-токен**, который обычно получается через отдельный процесс аутентификации (например, логин/пароль, OAuth, или иной механизм), либо вам его выдают отдельно как Access Token.
+
+3. Если в `.env` у вас хранится именно секрет (ключ), а не токен, то вы не можете просто вставить его в заголовок `Authorization: Bearer <JWT_SECRET>`, потому что API ожидает **валидный токен**, а не секрет.
+
+---
+
+### Что делать?
+
+- Проверьте документацию API Wildberries — как именно получить токен для авторизации.
+- Возможно, вам нужно сделать запрос на получение токена (например, передать логин/пароль или ключ API), и получить от API JWT-токен.
+- После этого вы используете полученный токен в заголовке `Authorization: Bearer <полученный_токен>`.
+
+---
+
+### Как использовать токен в axios
+
+```ts
+import dotenv from 'dotenv';
+dotenv.config();
+
+const token = process.env.WB_ACCESS_TOKEN; // токен, а не секрет
+
+const response = await axios.get(WB_TARIFFS_URL, {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+});
+```
+
+---
+
+### Если у вас только JWT_SECRET, и вы хотите сами сформировать токен
+
+- Это возможно, если API принимает самоподписанные JWT, но это редкий кейс.
+- Для этого нужно знать, какие данные (payload) и с каким алгоритмом подписывать.
+- Обычно это не так, и токен нужно получать у API.
+
+---
+
+### Итог
+
+- **JWT_SECRET из `.env` — это не токен, а ключ.**
+- Для доступа к API нужен именно **токен (JWT Access Token)**.
+- Получите токен по инструкции Wildberries и используйте его в заголовке Authorization.
+- Если нужна помощь с получением токена — покажите документацию или опишите, как вы пытаетесь его получить.
+
+---
+
+Если хотите, могу помочь написать пример запроса для получения токена (если у вас есть данные для аутентификации) и последующего вызова API с этим токеном.
+
+когда мен прислали тест то написали что  я получу API ключ и вот они мне его прислали Спасибо!
+Высылаем ключ:
+eyJhbGciOiJFUzI1NiIsImtpZCI6IjIwMjUwNTIwdjEiLCJ0eXAiOiJKV1QifQ.eyJlbnQiOjEsImV4cCI6MTc2NTY3MDIyOSwiaWQiOiIwMTk3NmU0Yy1mZTgwLTc1NDAtODkyMi02NGE5ZWUzYTU4MzYiLCJpaWQiOjQ1OTExNjA5LCJvaWQiOjExMzA0NiwicyI6MTA3Mzc0MTgzMiwic2lkIjoiOTMyYzE3NmEtNTA4NS01YzZmLWJjMzMtNGU4NGNkZjU4ZDdlIiwidCI6ZmFsc2UsInVpZCI6NDU5MTE2MDl9.wDoH8FLdZu1049uPCmhx3UHaw28YJB-CylWeD2LgkpRZFIMlOsUlnlVmfmYKy__JWNjfbDkOtdJ69QpSD5EKag - но ты говоришь что это не то?
+
+Спасибо за уточнение, теперь всё понятнее.
+
+---
+
+### Что вы получили — это и есть ваш API ключ (JWT-токен)
+
+То, что вам прислали — длинная строка, похожая на JWT (три части через точки) — это **ваш API ключ**, то есть **JWT Access Token**, который нужно передавать в заголовке `Authorization`.
+
+---
+
+### Как использовать этот ключ
+
+В вашем запросе к API Wildberries нужно передавать именно этот токен в заголовке:
+
+```ts
+const token = process.env.JWT_SECRET; // у вас в .env лежит этот ключ
+
+const response = await axios.get(WB_TARIFFS_URL, {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+});
+```
+
+---
+
+### Почему я говорил, что JWT_SECRET — это не токен?
+
+Потому что обычно в переменной с именем `JWT_SECRET` хранят именно **секретный ключ** для подписи JWT, а не сам токен. Но в вашем случае переменная названа `JWT_SECRET`, а на самом деле в ней лежит **полученный JWT-токен**, который нужно использовать как Access Token.
+
+---
+
+### Что делать, чтобы убрать ошибку 401?
+
+1. Убедитесь, что в коде вы используете именно этот токен из `.env` в заголовке `Authorization: Bearer <токен>`.
+2. Проверьте, что переменная окружения загружается корректно (например, через `console.log(process.env.JWT_SECRET)`).
+3. Проверьте, что заголовок передаётся именно так — с префиксом `Bearer ` и без лишних пробелов.
+4. Если всё сделано правильно, API должен принять запрос и не возвращать 401.
+
+---
+
+### Пример полного запроса с axios:
+
+```ts
+import axios from 'axios';
+import dotenv from 'dotenv';
+dotenv.config();
+
+const WB_TARIFFS_URL = 'https://suppliers-api.wildberries.ru/api/v1/info/tariffs';
+const token = process.env.JWT_SECRET;
+
+async function getTariffs() {
+  try {
+    const response = await axios.get(WB_TARIFFS_URL, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    console.log('Tariffs:', response.data);
+  } catch (error) {
+    console.error('Error fetching tariffs:', error.response?.data || error.message);
+  }
+}
+
+getTariffs();
+```
+
+---
+
+Если после этого ошибка 401 остаётся, возможно:
+
+- Токен устарел или отозван — нужно запросить новый.
+- В API есть дополнительные требования (например, IP-ограничения, другие заголовки).
+- Вы вызываете неправильный URL или метод.
+
+---
+
+Если хотите, могу помочь проверить ваш код или подсказать, как правильно настроить `.env` и axios.
+
+
+Почти — в вашем коде **в запросе к API отсутствует заголовок Authorization с токеном**, из-за чего вы и получаете 401.
+
+Нужно добавить в функцию `fetchTariffsFromWB` передачу заголовка с токеном из `.env` (который у вас в `process.env.JWT_SECRET`):
+
+```ts
+export async function fetchTariffsFromWB(): Promise<Tariff[]> {
+  const response = await axios.get(WB_TARIFFS_URL, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.data;
+}
+```
+
+---
+
+### Полный исправленный пример с комментариями:
+
+```ts
+import axios from "axios";
+import dotenv from "dotenv";
+import knex from "#postgres/knex";
+import { Tariff } from "#types/tariffs";
+
+dotenv.config();
+
+const WB_TARIFFS_URL = "https://common-api.wildberries.ru/api/v1/tariffs/box";
+const token = process.env.JWT_SECRET;
+
+export async function fetchTariffsFromWB(): Promise<Tariff[]> {
+  if (!token) {
+    throw new Error("JWT token is not defined in environment variable JWT_SECRET");
+  }
+
+  const response = await axios.get(WB_TARIFFS_URL, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.data;
+}
+
+export async function saveTariffsToDB(
+  tariffs: Tariff[],
+  date: Date
+): Promise<void> {
+  for (const tariff of tariffs) {
+    await knex("tariffs")
+      .insert({
+        tariff_id: tariff.tariff_id,
+        name: tariff.name,
+        price: tariff.price,
+        raw_data: JSON.stringify(tariff),
+        date,
+      })
+      .onConflict(["tariff_id", "date"])
+      .merge({
+        name: tariff.name,
+        price: tariff.price,
+        raw_data: JSON.stringify(tariff),
+        updated_at: knex.fn.now(),
+      });
+  }
+}
+
+export async function updateTariffs(): Promise<void> {
+  const tariffs = await fetchTariffsFromWB();
+  const today = new Date();
+  const dateString = today.toISOString().split("T")[0];
+  await saveTariffsToDB(tariffs, new Date(dateString));
+  console.log(`Tariffs updated for date ${dateString}`);
+}
+```
+
+---
+
+### Итог
+
+- Обязательно передавайте заголовок `Authorization: Bearer <token>`.
+- Проверьте, что в `.env` переменная `JWT_SECRET` содержит именно ваш JWT-токен.
+- Если токен устарел — запросите новый у Wildberries.
+- Ваш код сохранения и обновления в базе выглядит корректно.
+
+Если нужна помощь с отладкой — пишите!
+
+
+
+
