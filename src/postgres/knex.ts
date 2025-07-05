@@ -1,3 +1,8 @@
+/**
+ * то SQL-query builder (построитель SQL-запросов) для Node.js,
+ * который упрощает работу с реляционными базами данных
+ * (PostgreSQL, MySQL, SQLite, MSSQL и др.).
+ */
 import _knex from "knex";
 import knexConfig from "#config/knex/knexfile";
 

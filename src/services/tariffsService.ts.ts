@@ -1,11 +1,13 @@
 import axios from "axios";
 import dotenv from "dotenv";
 import knex from "#postgres/knex";
-import { Tariff } from "#types/tariffs";
+import { Tariff } from "#types/tariffs"; //интерфейс
 dotenv.config();
 
 // аддресс
 const WB_TARIFFS_URL = "https://common-api.wildberries.ru/api/v1/tariffs/box";
+
+// выданный секретынй ключ API переименовал JWT_SECRET
 const token = process.env.JWT_SECRET;
 
 /**
