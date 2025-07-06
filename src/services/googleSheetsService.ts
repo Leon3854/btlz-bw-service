@@ -5,14 +5,17 @@ const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 const GOOGLE_SHEETS_CREDENTIALS = process.env.GOOGLE_SHEETS_CREDENTIALS || ""; // JSON в env
 const GOOGLE_SHEETS_TOKEN = process.env.GOOGLE_SHEETS_TOKEN || ""; // JSON в env
 
-// Парсим credentials
+// Парсим credentials - реквезиты для входа
 const credentials = JSON.parse(GOOGLE_SHEETS_CREDENTIALS);
 
+// авторизация в гуглу
 const auth = new google.auth.GoogleAuth({
-  credentials,
-  scopes: SCOPES,
+  credentials, // реквевзиты для входа
+  scopes: SCOPES, // оценки
 });
 
+// version: "v4" — используем 4-ю версию API Google Таблиц (самую актуальную на 2025 год).
+// auth - объект аутентификации, необходимый для доступа к API
 const sheets = google.sheets({ version: "v4", auth });
 
 interface SheetInfo {
@@ -20,8 +23,11 @@ interface SheetInfo {
   name?: string; // Опционально имя листа
 }
 
-// Предположим, что у нас есть таблица в БД с id таблиц Google Sheets
-// Для примера, создадим тип и функцию получения этих id
+/**
+ * Получить список Google Sheets с их ID и (опционально) именами листов.
+ * В реальном приложении можно брать из базы, здесь возвращается примерный статический список.
+ * @returns {Promise<SheetInfo[]>} Массив объектов с id таблиц и именами листов
+ */
 export async function getGoogleSheetIds(): Promise<SheetInfo[]> {
   // Здесь можно хранить таблицы в отдельной таблице БД, например google_sheets
   // Для примера жестко возвращаем массив
@@ -36,6 +42,7 @@ export async function getGoogleSheetIds(): Promise<SheetInfo[]> {
  * Получить тарифы из БД для конкретной даты
  */
 export async function getTariffsFromDB(date: Date): Promise<any[]> {
+  // получаем дату с обрезом по времени(только дату без времени)
   const dateString = date.toISOString().split("T")[0];
   return knex("tariffs")
     .select("tariff_id", "name", "price")
@@ -47,12 +54,12 @@ export async function getTariffsFromDB(date: Date): Promise<any[]> {
  */
 export async function updateGoogleSheet(
   sheetId: string,
-  data: any[][]
+  data: any[][] // двумерный массив первый внешний а второй внутренний и мы не знаем что за данные там
 ): Promise<void> {
   // Очистим лист (например, 'Sheet1')
   const range = "Sheet1!A1";
 
-  // Запишем данные
+  // обнавляем электронные таблицы и их значение
   await sheets.spreadsheets.values.update({
     spreadsheetId: sheetId,
     range,
