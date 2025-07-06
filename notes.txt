@@ -2061,3 +2061,7 @@ Promise<void> в сигнатуре функции
 
 
 
+При создании новых миграций используется:
+
+bash
+npm run migrate:make migration_name
