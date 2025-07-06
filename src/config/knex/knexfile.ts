@@ -17,26 +17,27 @@ const knegConfigs: Record<typeof NODE_ENV, Knex.Config> = {
     client: "pg",
     connection: () =>
       connectionSchema.parse({
-        host: env.POSTGRES_HOST ?? "localhost",
-        port: env.POSTGRES_PORT ?? 5432,
-        database: env.POSTGRES_DB ?? "postgres",
-        user: env.POSTGRES_USER ?? "postgres",
-        password: env.POSTGRES_PASSWORD ?? "postgres",
+        host: process.env.POSTGRES_HOST || "localhost",
+        port: Number(process.env.POSTGRES_PORT) || 5432,
+        database: process.env.POSTGRES_DB || "postgres",
+        user: process.env.POSTGRES_USER || "postgres",
+        password: process.env.POSTGRES_PASSWORD || "postgres",
       }),
     pool: {
       min: 2,
       max: 10,
     },
     migrations: {
-      stub: "src/config/knex/migration.stub.js",
+      stub: "src/config/knex/migration.stub.ts",
       directory: "./src/postgres/migrations",
       tableName: "migrations",
       extension: "ts",
+      disableMigrationsListValidation: true, //будет игнорировать отсутсвие файлов
     },
     seeds: {
-      stub: "src/config/knex/seed.stub.js",
+      stub: "src/config/knex/seed.stub.ts",
       directory: "./src/postgres/seeds",
-      extension: "js",
+      extension: "ts",
     },
   },
   production: {
@@ -54,10 +55,10 @@ const knegConfigs: Record<typeof NODE_ENV, Knex.Config> = {
       max: 10,
     },
     migrations: {
-      stub: "dist/config/knex/migration.stub.js",
+      stub: "dist/config/knex/migration.stub.ts",
       directory: "./dist/postgres/migrations",
       tableName: "migrations",
-      extension: "js",
+      extension: "ts",
     },
     seeds: {
       stub: "src/config/knex/seed.stub.js",
