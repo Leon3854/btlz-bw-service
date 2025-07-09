@@ -1,24 +1,25 @@
-# your node version
-FROM node:20-alpine AS deps-prod
-
+# Этап установки зависимостей
+FROM node:20-alpine AS deps
 WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm install
 
-COPY ./package*.json .
-
-RUN npm install --omit=dev
-
-FROM deps-prod AS build
-
-RUN npm install --include=dev
-
+# Этап сборки
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-
 RUN npm run build
 
+# Финальный образ
 FROM node:20-alpine AS prod
-
 WORKDIR /app
 
-COPY --from=build /app/package*.json .
-COPY --from=deps-prod /app/node_modules ./node_modules
+# Копируем только необходимое
 COPY --from=build /app/dist ./dist
+COPY --from=deps /app/node_modules ./node_modules
+# Копируем из deps, а не из контекста
+COPY --from=deps /app/package.json ./
+COPY .env ./
+
+CMD ["node", "dist/app.js"]

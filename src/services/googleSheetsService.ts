@@ -1,5 +1,5 @@
 import { google, sheets_v4 } from "googleapis";
-import knex from "#postgres/knex";
+import knex from "../postgres/knex.js";
 
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 const GOOGLE_SHEETS_CREDENTIALS = process.env.GOOGLE_SHEETS_CREDENTIALS || ""; // JSON в env
