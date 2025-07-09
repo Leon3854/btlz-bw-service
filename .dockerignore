@@ -1,0 +1,13 @@
+# Стандартный .dockerignore для Node.js проектов
+node_modules/
+npm-debug.log
+.DS_Store
+.env.local
+.env.development
+.env.test
+.git
+.gitignore
+.dockerignore
+.idea
+.vscode
+dist/  # если собираетесь создавать dist при сборке

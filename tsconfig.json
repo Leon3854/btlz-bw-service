@@ -1,21 +1,24 @@
 {
   "compilerOptions": {
-    "strict": true,
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "target": "es2017",
-    "esModuleInterop": true,
+    "target": "ES2020", // Современный JS, поддерживается Node 20
+    "module": "ESNext", // ES-модули, чтобы использовать import/export
+    "moduleResolution": "node", // Разрешение модулей как в Node.js
+    "esModuleInterop": true, // Для удобной работы с CommonJS модулями
+    "forceConsistentCasingInFileNames": true,
     "allowJs": true,
-    "checkJs": true,
+    "rootDir": "./src", // Корень исходников
+    "outDir": "./dist", // Папка вывода скомпилированных файлов
     "skipLibCheck": true,
-    "rootDir": "./src",
-    "outDir": "./dist",
-    "baseUrl": "./src",
-    "paths": {
-      "#*": ["./*"],
-      "#config/*": ["./config/*"] // Отдельный алиас для config
-    }
+    "resolveJsonModule": true,
+    "strict": true,
+    "allowSyntheticDefaultImports": true, // нужно для работы Ts=>Js
+    "preserveSymlinks": true,
+    "importsNotUsedAsValues": "remove",
+    "noEmitOnError": true,
+    "sourceMap": false,
+    "declaration": false,
+    "checkJs": true //так же нужен для работы Ts=>Js
   },
-  "include": ["src/**/*.ts", "src/**/*.js"],
-  "exclude": ["node_modules"]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"] // иключаем папку из проверки типов Ts, Js
 }

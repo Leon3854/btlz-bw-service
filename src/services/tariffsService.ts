@@ -1,7 +1,7 @@
 import axios from "axios";
 import dotenv from "dotenv";
-import knex from "#postgres/knex";
-import { Tariff } from "#types/tariffs";
+import knex from "../postgres/knex.js";
+import { Tariff } from "../types/tariffs.js";
 dotenv.config();
 
 // аддресс

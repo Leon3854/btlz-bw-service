@@ -1,5 +1,5 @@
-import knex, { migrate, seed } from "#postgres/knex";
-import startScheduler from "#scheduler";
+import knex, { migrate, seed } from "./postgres/knex.js";
+import startScheduler from "./scheduler.js";
 
 async function main() {
   // Выполнение всех pending миграций БД (создание/обновление таблиц)

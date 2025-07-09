@@ -1,6 +1,6 @@
 import cron from "node-cron";
-import { updateTariffs } from "#services/tariffsService.ts";
-import { updateGoogleSheetsForTariffs } from "#services/googleSheetsService";
+import { updateTariffs } from "./services/tariffsService.js";
+import { updateGoogleSheetsForTariffs } from "./services/googleSheetsService.js";
 
 function startScheduler() {
   // Например, обновлять тарифы каждый день в 01:00
