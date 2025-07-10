@@ -1,4 +1,11 @@
 /**
+ *
+ * файл отвечает за безопасную и удобную работу с
+ * настройками приложения, которые хранятся в переменных
+ * окружения (environment variables)
+ */
+
+/**
  * dotenv — это npm-библиотека, которая загружает переменные окружения
  * (environment variables) из файла .env в process.env в Node.js-приложениях.
  * Это стандартный способ работы с конфигурацией и секретами
@@ -36,15 +43,20 @@ dotenv.config();
  * - APP_PORT: строка с числом или отсутствует, преобразуется в number
  */
 const envSchema = z.object({
+  // либо задана либло нет либо определенна как разработка или продакшен
   NODE_ENV: z.union([z.undefined(), z.enum(["development", "production"])]),
+
   POSTGRES_HOST: z.union([z.undefined(), z.string()]),
+  // должна быть строка состоящая из цифр которую потом переведут в числа
   POSTGRES_PORT: z
     .string()
     .regex(/^[0-9]+$/)
     .transform((value: string) => parseInt(value)),
+  // POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD — обязательные строки.
   POSTGRES_DB: z.string(),
   POSTGRES_USER: z.string(),
   POSTGRES_PASSWORD: z.string(),
+  // необязательный прорт тоже будет преобразован в число
   APP_PORT: z.union([
     z.undefined(),
     z
@@ -56,7 +68,11 @@ const envSchema = z.object({
 /**
  * Парсим и валидируем переменные окружения из process.env по заданной схеме.
  * При несоответствии схемы выбрасывается исключение с описанием ошибки.
+ * Здесь мы берём реальные значения из process.env и пропускаем их через схему envSchema.
+ * Если всё в порядке — получаем объект env с уже проверенными и при необходимости преобразованными значениями.
+ * Если что-то не так — программа выбросит ошибку с объяснением, что именно не подходит.
  */
+// Проверяем и преобразовываем переменных окружения
 const env = envSchema.parse({
   POSTGRES_HOST: process.env.POSTGRES_HOST,
   POSTGRES_PORT: process.env.POSTGRES_PORT,
@@ -67,4 +83,5 @@ const env = envSchema.parse({
   APP_PORT: process.env.APP_PORT,
 });
 
+// экспортируем готовые настройки
 export default env;
