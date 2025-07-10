@@ -1,18 +1,34 @@
+/**
+ * Настраиваем конфигурацию для подключения к базе данных PostgreSQL
+ * с помощью библиотеки Knex, используя переменные окружения и
+ * выбирая параметры в зависимости от текущей среды
+ * (development или production).
+ */
 import type { Knex } from "knex";
 import { config } from "dotenv";
-import { dirname, resolve } from "path";
-import { fileURLToPath } from "url";
+import { dirname, resolve } from "path"; // функции для работы с путями к файлам.
+import { fileURLToPath } from "url"; // преобразует URL модуля (ESM) в путь файловой системы
 
+// Вызывает dotenv.config(), чтобы переменные из .env стали доступны в process.env
 config();
 
+// Определение путей текущего файла и папки
+// В ES-модулях нет глобальных __filename и __dirname, поэтому они создаются вручную.
+// Нужно, правильно указывать пути к миграциям и сидерам (файлам для инициализации базы).
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// позволит избежать ошибок, если вдруг process.env.NODE_ENV будет иметь значение, не предусмотренное в knexConfigs.
+// Определение текущей среды исполнения
+/**
+ * Считывается NODE_ENV из переменных окружения.
+ * Если значение не "production", по умолчанию считается "development".
+ * Это предотвращает ошибки, если NODE_ENV задан некорректно.
+ */
 const nodeEnvRaw = process.env.NODE_ENV;
 const NODE_ENV: "development" | "production" =
   nodeEnvRaw === "production" ? "production" : "development";
 
+// Объект конфигураций для разных сред
 const knexConfigs: Record<"development" | "production", Knex.Config> = {
   development: {
     client: "pg",
