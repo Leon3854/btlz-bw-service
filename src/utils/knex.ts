@@ -1,3 +1,9 @@
+/**
+ * Этот файл реализует CLI (командный интерфейс) для
+ * управления миграциями и сидированием базы данных PostgreSQL с помощью knex.
+ * Он позволяет запускать команды миграций и сидов из командной строки.
+ */
+
 import { migrate, seed } from "../postgres/knex.js";
 import { Command } from "commander";
 const program = new Command();

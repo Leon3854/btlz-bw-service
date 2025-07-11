@@ -11,6 +11,13 @@ const token = process.env.JWT_SECRET;
 /**
  * Получает тарифы из публичного API Wildberries.
  * @returns {Promise<Tariff[]>} Массив тарифов.
+ * Проверяет наличие JWT-токена (выбрасывает ошибку, если токен не задан в .env)
+ * Отправляет GET-запрос к Wildberries API с авторизацией через Bearer Token
+ * Возвращает массив тарифов из ответа API
+ * Использует axios для HTTP-запросов
+ * Токен берется из переменной окружения JWT_SECRET
+ * URL API жестко закодирован (WB_TARIFFS_URL)
+ * Предполагает, что API возвращает данные в поле response.data
  */
 export async function fetchTariffsFromWB(): Promise<Tariff[]> {
   if (!token) {
@@ -29,9 +36,22 @@ export async function fetchTariffsFromWB(): Promise<Tariff[]> {
 
 /**
  * Сохраняет тарифы в базу данных для указанной даты.
+ * Сохранение тарифов в PostgreSQL с обработкой дубликатов.
  * Использует upsert (ON CONFLICT) для вставки или обновления записей.
  * @param {Tariff[]} tariffs - Массив тарифов для сохранения.
  * @param {Date} date - Дата, на которую сохраняются тарифы (только дата без времени).
+ * Для каждого тарифа в массиве - Выполним UPSERT операцию (вставка или обновление):
+ * Вставляет новую запись, если тарифа с таким tariff_id на указанную дату еще нет
+ * Обновляет существующую запись при конфликте (ON CONFLICT)
+ * Сохраняет: Основные данные тарифа (tariff_id, name, price)
+ * Сырые данные в JSON (raw_data)
+ * Дату (date) без времени
+ *
+ * Использует Knex для работы с PostgreSQL
+ * Конфликт определяется по комбинации tariff_id и date
+ * При обновлении меняет: название, цену, сырые данные и метку времени (updated_at)
+ * knex.fn.now() генерирует текущую timestamp на стороне БД
+ *
  */
 export async function saveTariffsToDB(
   tariffs: Tariff[],
@@ -60,6 +80,13 @@ export async function saveTariffsToDB(
 /**
  * Обновляет тарифы: получает актуальные данные из Wildberries и сохраняет их в базу на текущую дату.
  * По завершении выводит сообщение в консоль.
+ * Получает актуальные тарифы через fetchTariffsFromWB()
+ * Форматирует текущую дату в строку yyyy-mm-dd
+ * Сохраняет тарифы через saveTariffsToDB()
+ * Выводит лог об успешном обновлении
+ * Автоматически используем текущую дату
+ * Объединяет все этапы работы с тарифами в один вызов
+ * Логирует результат в консоль
  */
 export async function updateTariffs(): Promise<void> {
   const tariffs = await fetchTariffsFromWB();
