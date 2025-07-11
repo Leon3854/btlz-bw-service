@@ -1,6 +1,7 @@
 import _knex from "knex";
 import knexConfig from "../config/knex/knexfile.js";
 
+// Создает экземпляр Knex с конфигурацией из knexfile.js
 const knex = _knex(knexConfig);
 
 // Типизация для migrate и seed

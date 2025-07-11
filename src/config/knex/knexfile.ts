@@ -29,10 +29,23 @@ const NODE_ENV: "development" | "production" =
   nodeEnvRaw === "production" ? "production" : "development";
 
 // Объект конфигураций для разных сред
+/**
+ *
+ */
+
+// Объявляется объект с двумя ключами: development и production
 const knexConfigs: Record<"development" | "production", Knex.Config> = {
+  // для каждой среды задается конфигурация knex
   development: {
-    client: "pg",
+    client: "pg", // -используется PostgreSQL
     connection: {
+      // - параметры подключения к базе берутся из переменных окружения.
+      /**
+       * В development есть значения по умолчанию (например, localhost, порт 5432),
+       * чтобы удобно запускать локально без .env.
+       * В production значения обязательны (без значений по умолчанию), чтобы не
+       * подключаться к неправильной базе.
+       */
       host: process.env.POSTGRES_HOST || "localhost",
       port: Number(process.env.POSTGRES_PORT) || 5432,
       database: process.env.POSTGRES_DB || "postgres",
@@ -40,17 +53,20 @@ const knexConfigs: Record<"development" | "production", Knex.Config> = {
       password: process.env.POSTGRES_PASSWORD || "postgres",
     },
     pool: {
+      // — пул подключений к базе (минимум 2, максимум 10).
       min: 2,
       max: 10,
     },
     migrations: {
-      stub: resolve(__dirname, "migration.stub.ts"),
-      directory: resolve(__dirname, "../../postgres/migrations"),
-      tableName: "migrations",
-      extension: "ts",
-      disableMigrationsListValidation: true,
+      // — настройки для миграций базы
+      stub: resolve(__dirname, "migration.stub.ts"), // — путь к шаблону миграции.
+      directory: resolve(__dirname, "../../postgres/migrations"), // — где лежат файлы миграций
+      tableName: "migrations", // — таблица в базе, где хранится информация о применённых миграциях.
+      extension: "ts", // - расширение файлов миграций (ts для разработки, js для продакшена).
+      disableMigrationsListValidation: true, // - в настройках Knex.js отключает проверку целостности списка миграций
     },
     seeds: {
+      // - настройка для сидов начальных данных
       stub: resolve(__dirname, "seed.stub.ts"),
       directory: resolve(__dirname, "../../postgres/seeds"),
       extension: "ts",
@@ -66,8 +82,8 @@ const knexConfigs: Record<"development" | "production", Knex.Config> = {
       password: process.env.POSTGRES_PASSWORD, // Исправлено: process.env вместо env
     },
     pool: {
-      min: 2,
-      max: 10,
+      min: 2, // Минимальное количество соединений в пуле
+      max: 10, // Максимальное количество соединений
     },
     migrations: {
       stub: resolve(__dirname, "migration.stub.js"),
@@ -83,4 +99,11 @@ const knexConfigs: Record<"development" | "production", Knex.Config> = {
   },
 };
 
+/**
+ * Экспорт конфигурации в зависимости от среды
+ * Экспортируется конфигурация, соответствующая текущей среде.
+ * Это значит, что при импорте этого файла получаем уже готовый
+ * объект настроек для Knex, который можно передать при
+ * инициализации подключения к базе.
+ */
 export default knexConfigs[NODE_ENV];
