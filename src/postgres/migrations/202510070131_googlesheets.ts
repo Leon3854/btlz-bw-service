@@ -23,6 +23,11 @@ export async function up(knex: Knex): Promise<void> {
   });
 }
 
+/**
+ * Откатывает миграцию - удаляет таблицы 'tariffs' и 'google_sheets'.
+ * Вызывается при выполнении команды `knex migrate:rollback`.
+ * ВНИМАНИЕ: Приведет к безвозвратной потере всех данных в этих таблицах!
+ */
 export async function down(knex: Knex): Promise<void> {
   await knex.schema.dropTable("tariffs");
   await knex.schema.dropTable("google_sheets");
