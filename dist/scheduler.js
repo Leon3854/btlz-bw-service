@@ -20,8 +20,8 @@ import { updateGoogleSheetsForTariffs } from "./services/googleSheetsService.js"
  * В случае ошибки в любом из шагов она ловится и выводится в консоль.
  */
 function startScheduler() {
-  // Например, обновлять тарифы каждый день в 01:00
-  cron.schedule("0 1 * * *", async () => {
+  // Например, обновлять тарифы каждый день в 01:00 и в 13:00
+  cron.schedule("0 1,13* * *", async () => {
     try {
       console.log("Starting tariffs update...");
       await updateTariffs();
